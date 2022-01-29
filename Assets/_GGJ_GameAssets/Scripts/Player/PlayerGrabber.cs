@@ -26,6 +26,9 @@ public class PlayerGrabber : MonoBehaviour
     bool attached = false;
     bool justShot = false;
 
+    float grabberCD = .05f;
+    bool onCD = false;
+
     private void Awake()
     {
         mybody = GetComponent<Rigidbody2D>();
@@ -39,6 +42,15 @@ public class PlayerGrabber : MonoBehaviour
     void Update()
     {
         CheckInput();
+        if (onCD)
+        {
+            grabberCD -= Time.deltaTime;
+            if(grabberCD <= 0.0f)
+            {
+                grabberCD = .05f;
+                onCD = false;
+            }
+        }
     }
 
     private void LateUpdate()
@@ -62,18 +74,20 @@ public class PlayerGrabber : MonoBehaviour
             {
                 DropAttachedGrabbable();
             }
-
-            if (Vector3.Distance(grabberTip.position, transform.position) > minDistance)
-            {
-                Vector3 moveDir = ((Vector2)transform.position - (Vector2)grabberTip.position).normalized * Time.deltaTime * shotSpeed;
-                grabberTip.position += moveDir;
-                attachedGrabbable.transform.position = grabberTip.position;
-                lineRend.SetPosition(0, grabberHandsTransform.position);
-                lineRend.SetPosition(1, grabberTip.position);
-            }
             else
             {
-                HoldItem();
+                if (Vector3.Distance(grabberTip.position, transform.position) > minDistance)
+                {
+                    Vector3 moveDir = ((Vector2)transform.position - (Vector2)grabberTip.position).normalized * Time.deltaTime * shotSpeed;
+                    grabberTip.position += moveDir;
+                    attachedGrabbable.transform.position = grabberTip.position;
+                    lineRend.SetPosition(0, grabberHandsTransform.position);
+                    lineRend.SetPosition(1, grabberTip.position);
+                }
+                else
+                {
+                    HoldItem();
+                }
             }
         }
         if (holding)
@@ -82,14 +96,16 @@ public class PlayerGrabber : MonoBehaviour
             {
                 DropAttachedGrabbable();
             }
-
-            lineRend.SetPosition(0, grabberHandsTransform.position);
-            lineRend.SetPosition(1, grabberTip.position);
-            Vector3[] trajectory = Plot(mybody, attachedGrabbable.transform.position, aimer.aimDirection * throwForce, 100);
-            trajectoryRend.positionCount = trajectory.Length;
-            for (int i = 0; i < trajectoryRend.positionCount; i++)
+            else
             {
-                trajectoryRend.SetPositions(trajectory);
+                lineRend.SetPosition(0, grabberHandsTransform.position);
+                lineRend.SetPosition(1, grabberTip.position);
+                Vector3[] trajectory = Plot(mybody, attachedGrabbable.transform.position, aimer.aimDirection * throwForce, 100);
+                trajectoryRend.positionCount = trajectory.Length;
+                for (int i = 0; i < trajectoryRend.positionCount; i++)
+                {
+                    trajectoryRend.SetPositions(trajectory);
+                }
             }
         }
     }
@@ -124,8 +140,7 @@ public class PlayerGrabber : MonoBehaviour
                 StopShot();
             }
         }
-
-        if (Input.GetMouseButton(1))
+        else if (Input.GetMouseButton(1) &! onCD)
         {
             if (hit.collider != null && !attached & !justShot)
             {
@@ -166,12 +181,15 @@ public class PlayerGrabber : MonoBehaviour
             trajectoryRend.enabled = false;
             lineRend.enabled = false;
             justShot = false;
+            onCD = true;
             if (attachedGrabbable != null)
             {
                 attachedGrabbable.transform.SetParent(null);
 
                 if (holding)
                 {
+                    //Debug.Log("Throwing");
+                    justShot = true;
                     attachedGrabbable.Throw(aimer.aimDirection, throwForce);
                 }
                 else
@@ -189,10 +207,12 @@ public class PlayerGrabber : MonoBehaviour
         lineRend.enabled = true;
         grabberTip.position = transform.position;
         justShot = true;
+        onCD = true;
     }
 
     void AttachGrabber()
     {
+        //Debug.Log("Attached");
         attached = true;
         justShot = false;
 
@@ -200,10 +220,17 @@ public class PlayerGrabber : MonoBehaviour
         lineRend.SetPosition(0, grabberHandsTransform.position);
         lineRend.SetPosition(1, grabberTip.position);
 
-        attachedGrabbable = hit.collider.GetComponent<Grabbable>();
-        attachedGrabbable.transform.SetParent(grabberTip);
-        attachedGrabbable.transform.localPosition = Vector3.zero;
-        attachedGrabbable.PickUp();
+        if (hit.collider == null)
+        {
+            DropAttachedGrabbable();
+        }
+        else
+        {
+            attachedGrabbable = hit.collider.GetComponent<Grabbable>();
+            attachedGrabbable.transform.SetParent(grabberTip);
+            attachedGrabbable.transform.localPosition = Vector3.zero;
+            attachedGrabbable.PickUp();
+        }
     }
 
     public Vector3[] Plot(Rigidbody2D body, Vector2 pos, Vector2 vel, int steps)

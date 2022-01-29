@@ -136,7 +136,7 @@ public class PlayerMovement : MonoBehaviour
     void Jump()
     {
         justJumped = true;
-        Debug.Log("Jumping");
+        //Debug.Log("Jumping");
         myAnim.SetBool("Jumping", true);
         myBody.AddForce(Vector3.up * initialJumpForce, ForceMode2D.Impulse);
         if (jumpRoutine != null) StopCoroutine(jumpRoutine);
