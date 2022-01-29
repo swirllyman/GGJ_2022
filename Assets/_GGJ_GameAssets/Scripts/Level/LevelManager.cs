@@ -36,5 +36,10 @@ public class LevelManager : MonoBehaviour
         // Unlock next level
         // Display option to go to next level
         // Possible stretch goal to connect levels and indicate save at side of screen
+        Debug.Log("Level complete");
+    }
+
+    public void SetGoalComplete(string goalId) {
+        CompleteLevel();
     }
 }
