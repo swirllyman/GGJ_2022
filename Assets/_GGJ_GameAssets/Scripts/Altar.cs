@@ -10,6 +10,7 @@ public class Altar : MonoBehaviour
     [SerializeField] Color altarPowerOnColor;
     [SerializeField] Collider2D colliderNeeded;
     [SerializeField] TMP_Text myText;
+    [SerializeField] LineRenderer powerLineRend;
 
     [SerializeField] Transform powerSpot;
 
@@ -19,15 +20,23 @@ public class Altar : MonoBehaviour
     [SerializeField] float moveToSpotTime = .5f;
     [SerializeField] int powerOnTime = 1;
 
-    bool poweredUp = false;
-
+    internal bool poweredUp = false;
     Vector3 startScale;
+
+    public delegate void PoweredUpCallack();
+    public event PoweredUpCallack onPoweredUp;
+
+
 
     private void Awake()
     {
         startScale = messageDisplay.transform.localScale;
         messageDisplay.SetActive(false);
         LeanTween.color(gameObject, poweredDownColor, 0.0f);
+
+        powerLineRend.startColor = poweredDownColor; 
+        powerLineRend.endColor = poweredDownColor;
+
         myText.text = "Required For Power";
     }
 
@@ -73,6 +82,14 @@ public class Altar : MonoBehaviour
         LeanTween.move(colliderNeeded.gameObject, powerSpot.position, moveToSpotTime).setEaseInCubic();
         yield return new WaitForSeconds(moveToSpotTime);
         LeanTween.color(gameObject, altarPowerOnColor, powerOnTime).setEaseOutCubic();
+        LeanTween.color(powerLineRend.gameObject, altarPowerOnColor, powerOnTime).setEaseOutCubic();
+        for (float i = 0; i < powerOnTime; i += Time.deltaTime)
+        {
+            powerLineRend.startColor = Color.Lerp(poweredDownColor, altarPowerOnColor, i / powerOnTime);
+            powerLineRend.endColor = Color.Lerp(poweredDownColor, altarPowerOnColor, i / powerOnTime);
+        }
+
+        onPoweredUp?.Invoke();
     }
 
     private void OnTriggerExit2D(Collider2D collision)

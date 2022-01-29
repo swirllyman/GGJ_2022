@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 [RequireComponent(typeof(Rigidbody2D))]
 [RequireComponent(typeof(CapsuleCollider2D))]
@@ -98,7 +99,8 @@ public class PlayerMovement : MonoBehaviour
     {
         if (Mathf.Abs(transform.position.x) > resetDistance || Mathf.Abs(transform.position.y) > resetDistance)
         {
-            Reset();
+            SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
+            Application.LoadLevel(Application.loadedLevel);
         }
     }
 

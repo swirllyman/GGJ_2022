@@ -1,10 +1,12 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-
+using Cinemachine;
 public class Aimer2D : MonoBehaviour
 {
     public Transform crosshair;
+    public CinemachineVirtualCamera playerV_Cam;
+    public float cameraOffsetDistance = .35f;
     internal Vector3 aimDirection;
     internal float aimDistance = 1.0f;
 
