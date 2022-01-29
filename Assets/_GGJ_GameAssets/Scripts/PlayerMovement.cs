@@ -7,7 +7,8 @@ using UnityEngine;
 public class PlayerMovement : MonoBehaviour
 {
     [Header("Movement")]
-    [SerializeField]float moveSpeed = 1;
+    [SerializeField] float moveSpeedGround = 1;
+    [SerializeField] float moveSpeedAir = .35f;
     [SerializeField] float maxVelocity = 1;
     [SerializeField] float wallDistanceCheck = .08f;
 
@@ -17,6 +18,7 @@ public class PlayerMovement : MonoBehaviour
     [SerializeField] float groundedDistance = .1f;
 
     [Header("Extras")]
+    [SerializeField] Animator myAnim;
     [SerializeField] LayerMask collisionMask;
     [SerializeField] float resetDistance = 50;
 
@@ -25,8 +27,14 @@ public class PlayerMovement : MonoBehaviour
     Rigidbody2D myBody;
     CapsuleCollider2D myCollider;
     Vector2 movePos;
+    Vector2 moveDir;
+
+    Coroutine jumpRoutine;
 
     bool justJumped = false;
+    bool grounded = false;
+    bool wasGrounded = false;
+
 
     #region Mono
     private void Awake()
@@ -40,6 +48,7 @@ public class PlayerMovement : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        CheckGrounded();
         movePos = new Vector2(Input.GetAxisRaw("Horizontal"), Input.GetAxisRaw("Vertical"));
         CheckReset();
         CheckJump();
@@ -49,12 +58,14 @@ public class PlayerMovement : MonoBehaviour
     {
         UpdateMovement();
         UpdateJump();
+        UpdateAnimation();
     }
     #endregion
 
     void UpdateMovement()
     {
-        Vector2 moveDir = new Vector2(movePos.x * moveSpeed, 0);
+        moveDir = new Vector2(movePos.x * (grounded ? moveSpeedGround : moveSpeedAir), 0);
+
         if(moveDir.x > 0)
         {
             transform.rotation = Quaternion.Euler(Vector3.zero);
@@ -74,6 +85,15 @@ public class PlayerMovement : MonoBehaviour
         }
     }
     
+    void UpdateAnimation()
+    {
+        if (!justJumped)
+        {
+            myAnim.SetFloat("GroundSpeed", Mathf.Abs(moveDir.x) > 0 ? 1.0f : 0.0f);
+            myAnim.SetBool("Falling", !grounded);
+        }
+    }
+
     void CheckReset()
     {
         if (Mathf.Abs(transform.position.x) > resetDistance || Mathf.Abs(transform.position.y) > resetDistance)
@@ -91,7 +111,7 @@ public class PlayerMovement : MonoBehaviour
     #region Jumping
     void CheckJump()
     {
-        if (Grounded() & !justJumped)
+        if (grounded & !justJumped)
         {
             if (Input.GetKeyDown(KeyCode.Space))
             {
@@ -103,8 +123,11 @@ public class PlayerMovement : MonoBehaviour
     void Jump()
     {
         justJumped = true;
+        Debug.Log("Jumping");
+        myAnim.SetBool("Jumping", true);
         myBody.AddForce(Vector3.up * initialJumpForce, ForceMode2D.Impulse);
-        StartCoroutine(ResetJump());
+        if (jumpRoutine != null) StopCoroutine(jumpRoutine);
+        jumpRoutine = StartCoroutine(ResetJump());
     }
 
 
@@ -121,7 +144,14 @@ public class PlayerMovement : MonoBehaviour
 
     IEnumerator ResetJump()
     {
-        yield return new WaitForSeconds(.5f);
+        yield return new WaitForSeconds(1.0f);
+        StopJump();
+    }
+
+    void StopJump()
+    {
+        if (jumpRoutine != null) StopCoroutine(jumpRoutine);
+        myAnim.SetBool("Jumping", false);
         justJumped = false;
     }
     #endregion
@@ -133,8 +163,22 @@ public class PlayerMovement : MonoBehaviour
     }
 
     //return true if an object is under us
-    bool Grounded()
+    void CheckGrounded()
     {
-        return Physics2D.CircleCast(transform.position, myCollider.size.x, Vector3.down, groundedDistance, collisionMask).collider != null;
+        grounded = Physics2D.CircleCast(transform.position, myCollider.size.x, Vector3.down, groundedDistance, collisionMask).collider != null;
+        if(wasGrounded != grounded)
+        {
+            GroundedChanged();
+        }
+    }
+
+    void GroundedChanged()
+    {
+        wasGrounded = grounded;
+        if (grounded && justJumped)
+        {
+            StopJump();
+        }
+
     }
 }
