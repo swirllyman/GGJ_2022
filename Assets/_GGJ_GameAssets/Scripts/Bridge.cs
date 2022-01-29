@@ -20,6 +20,14 @@ public class Bridge : MonoBehaviour
         vCam.enabled = false;
     }
 
+    private void Update()
+    {
+        if (Input.GetKeyDown(KeyCode.LeftControl))
+        {
+            vCam.enabled = !vCam.enabled;
+        }
+    }
+
     private void MyAltar_onPoweredUp()
     {
         if (AllPoweredUp())

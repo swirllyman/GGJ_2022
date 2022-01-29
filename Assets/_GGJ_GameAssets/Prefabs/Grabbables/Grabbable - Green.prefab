@@ -7,6 +7,34 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 3546219374694544350, guid: c19249790c76c394a8acb2a415871507, type: 3}
+      propertyPath: m_Color.b
+      value: 0.6179246
+      objectReference: {fileID: 0}
+    - target: {fileID: 3546219374694544350, guid: c19249790c76c394a8acb2a415871507, type: 3}
+      propertyPath: m_Color.g
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3546219374694544350, guid: c19249790c76c394a8acb2a415871507, type: 3}
+      propertyPath: m_Color.r
+      value: 0.63806474
+      objectReference: {fileID: 0}
+    - target: {fileID: 3546219374694544350, guid: c19249790c76c394a8acb2a415871507, type: 3}
+      propertyPath: m_Intensity
+      value: 2.71
+      objectReference: {fileID: 0}
+    - target: {fileID: 3546219376340762897, guid: c19249790c76c394a8acb2a415871507, type: 3}
+      propertyPath: flashColor.b
+      value: 0.3254902
+      objectReference: {fileID: 0}
+    - target: {fileID: 3546219376340762897, guid: c19249790c76c394a8acb2a415871507, type: 3}
+      propertyPath: flashColor.g
+      value: 0.7529412
+      objectReference: {fileID: 0}
+    - target: {fileID: 3546219376340762897, guid: c19249790c76c394a8acb2a415871507, type: 3}
+      propertyPath: flashColor.r
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 3546219376340762986, guid: c19249790c76c394a8acb2a415871507, type: 3}
       propertyPath: m_Name
       value: Grabbable - Green
@@ -59,6 +87,18 @@ PrefabInstance:
       propertyPath: m_Sprite
       value: 
       objectReference: {fileID: 7482667652216324306, guid: 48e93eef0688c4a259cb0eddcd8661f7, type: 3}
+    - target: {fileID: 3546219376340762991, guid: c19249790c76c394a8acb2a415871507, type: 3}
+      propertyPath: m_Color.b
+      value: 0.16470589
+      objectReference: {fileID: 0}
+    - target: {fileID: 3546219376340762991, guid: c19249790c76c394a8acb2a415871507, type: 3}
+      propertyPath: m_Color.g
+      value: 0.30980393
+      objectReference: {fileID: 0}
+    - target: {fileID: 3546219376340762991, guid: c19249790c76c394a8acb2a415871507, type: 3}
+      propertyPath: m_Color.r
+      value: 0.05490196
+      objectReference: {fileID: 0}
     m_RemovedComponents:
     - {fileID: 3546219376340762988, guid: c19249790c76c394a8acb2a415871507, type: 3}
   m_SourcePrefab: {fileID: 100100000, guid: c19249790c76c394a8acb2a415871507, type: 3}

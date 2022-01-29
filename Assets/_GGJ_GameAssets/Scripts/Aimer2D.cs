@@ -5,17 +5,21 @@ using Cinemachine;
 public class Aimer2D : MonoBehaviour
 {
     public Transform crosshair;
+    [SerializeField] Transform lookAtObject;
     public CinemachineVirtualCamera playerV_Cam;
     public float cameraOffsetDistance = .35f;
+    [SerializeField] float camTargetSpeed = .25f;
     internal Vector3 aimDirection;
     internal float aimDistance = 1.0f;
 
     
     float mouseDistance;
-    // Start is called before the first frame update
-    void Start()
+
+    CinemachineComposer composer;
+
+    private void Start()
     {
-        
+        composer = playerV_Cam.GetCinemachineComponent<CinemachineComposer>();
     }
 
     // Update is called once per frame
@@ -34,6 +38,12 @@ public class Aimer2D : MonoBehaviour
 
         aimDirection = Quaternion.Euler(0, 0, aimAngle * Mathf.Rad2Deg) * Vector2.right;
         SetCrosshairPosition(aimAngle);
+        lookAtObject.localPosition = Vector3.Lerp(lookAtObject.localPosition, aimDirection * cameraOffsetDistance, Time.deltaTime * camTargetSpeed);
+
+        if (Input.GetKeyDown(KeyCode.LeftControl))
+        {
+            playerV_Cam.enabled = !playerV_Cam.enabled;
+        }
     }
 
     /// <summary>

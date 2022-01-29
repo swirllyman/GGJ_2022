@@ -104,7 +104,7 @@ public class PlayerGrapple : MonoBehaviour
 
         if (Input.GetMouseButton(0))
         {
-            if (hit.collider != null && !attached & !justShot)
+            if (hit.collider != null && !attached & !justShot &! (transform.position.y > hit.point.y))
             {
                 ShootGrapple();
             }
@@ -131,7 +131,6 @@ public class PlayerGrapple : MonoBehaviour
             myGrappleJoint.enabled = false;
             lineRend.enabled = false;
             myAnim.SetBool("Grapple", false);
-            //myBody.velocity *= 2;
             myBody.AddForce(Vector2.up * grappleReleaseSpeed, ForceMode2D.Impulse);
             aimer.crosshair.gameObject.SetActive(true);
         }

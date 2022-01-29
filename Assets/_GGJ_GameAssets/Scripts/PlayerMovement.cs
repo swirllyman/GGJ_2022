@@ -12,6 +12,7 @@ public class PlayerMovement : MonoBehaviour
     [SerializeField] float moveSpeedAir = .35f;
     [SerializeField] float maxVelocity = 1;
     [SerializeField] float wallDistanceCheck = .08f;
+    [SerializeField] Vector2 verticalVelocityMax = new Vector2(3, 3);
 
     [Header("Jumping")]
     [SerializeField] float initialJumpForce = 2.5f;
@@ -80,9 +81,20 @@ public class PlayerMovement : MonoBehaviour
             myBody.AddForce(moveDir, ForceMode2D.Impulse);
         }
 
+        //Limiting Velocity
         if (Mathf.Abs(myBody.velocity.x) > maxVelocity)
         {
             myBody.velocity = new Vector3(myBody.velocity.x > 0 ? maxVelocity : -maxVelocity, myBody.velocity.y);
+        }
+
+        if (myBody.velocity.y < 0 && Mathf.Abs(myBody.velocity.y) > verticalVelocityMax.x)
+        {
+            myBody.velocity = new Vector3(myBody.velocity.x, -verticalVelocityMax.x);
+        }
+
+        if (myBody.velocity.y > 0 && Mathf.Abs(myBody.velocity.y) > verticalVelocityMax.y)
+        {
+            myBody.velocity = new Vector3(myBody.velocity.x, verticalVelocityMax.y);
         }
     }
     
@@ -100,7 +112,6 @@ public class PlayerMovement : MonoBehaviour
         if (Mathf.Abs(transform.position.x) > resetDistance || Mathf.Abs(transform.position.y) > resetDistance)
         {
             SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
-            Application.LoadLevel(Application.loadedLevel);
         }
     }
 
