@@ -692,7 +692,7 @@ MonoBehaviour:
   collisionMask:
     serializedVersion: 2
     m_Bits: 51
-  resetDistance: 50
+  resetDistance: 20
 --- !u!114 &936399164
 MonoBehaviour:
   m_ObjectHideFlags: 0
