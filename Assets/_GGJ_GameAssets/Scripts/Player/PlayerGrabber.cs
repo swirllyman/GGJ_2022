@@ -226,7 +226,7 @@ public class PlayerGrabber : MonoBehaviour
         }
         else
         {
-            var pullableObject = hit.collider.GetComponentInParent(typeof(MovablePlatform)) as MovablePlatform;
+            var pullableObject = hit.collider.GetComponentInParent(typeof(GrabPlatform)) as GrabPlatform;
             if (pullableObject != null) {
                 Debug.Log("pulling");
                 pullableObject.OnActivate();
