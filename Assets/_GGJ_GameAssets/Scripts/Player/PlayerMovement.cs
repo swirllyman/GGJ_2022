@@ -19,19 +19,31 @@ public class PlayerMovement : MonoBehaviour
     [SerializeField] float sustainedJumpForce = .5f;
     [SerializeField] float groundedDistance = .1f;
 
+    [Header("Slope")]
+    [SerializeField] float slopeCheckDistance;
+    [SerializeField] float maxSlopeAngle;
+    [SerializeField] PhysicsMaterial2D noFriction;
+    [SerializeField] PhysicsMaterial2D fullFriction;
+
     [Header("Extras")]
     [SerializeField] Animator myAnim;
     [SerializeField] LayerMask collisionMask;
     [SerializeField] float resetDistance = 50;
 
     Vector3 startPosition;
-
+    Vector2 slopeNormalPerp;
     Rigidbody2D myBody;
     CapsuleCollider2D myCollider;
     Vector2 movePos;
     Vector2 moveDir;
 
     Coroutine jumpRoutine;
+
+    private bool isOnSlope;
+    private bool canWalkOnSlope;
+    private float slopeDownAngle;
+    private float slopeSideAngle;
+    private float lastSlopeAngle;
 
     bool justJumped = false;
     bool grounded = false;
@@ -58,6 +70,7 @@ public class PlayerMovement : MonoBehaviour
 
     private void FixedUpdate()
     {
+        SlopeCheck();
         UpdateMovement();
         UpdateJump();
         UpdateAnimation();
@@ -66,19 +79,27 @@ public class PlayerMovement : MonoBehaviour
 
     void UpdateMovement()
     {
-        moveDir = new Vector2(movePos.x * (grounded ? moveSpeedGround : moveSpeedAir), 0);
 
-        if(moveDir.x > 0)
+        moveDir = new Vector2(movePos.x * (grounded ? moveSpeedGround : moveSpeedAir), 0);
+        if (grounded && isOnSlope && canWalkOnSlope && !justJumped) 
         {
-            transform.rotation = Quaternion.Euler(Vector3.zero);
+            
+            myBody.velocity = new Vector2(slopeNormalPerp.x * -moveDir.x, slopeNormalPerp.y * -moveDir.x);
         }
-        else if(moveDir.x < 0)
+        else
         {
-            transform.rotation = Quaternion.Euler(0, 180, 0);
-        }
-        if (CanMove(moveDir))
-        {
-            myBody.AddForce(moveDir, ForceMode2D.Impulse);
+            if (moveDir.x > 0)
+            {
+                transform.rotation = Quaternion.Euler(Vector3.zero);
+            }
+            else if (moveDir.x < 0)
+            {
+                transform.rotation = Quaternion.Euler(0, 180, 0);
+            }
+            if (CanMove(moveDir))
+            {
+                myBody.AddForce(moveDir, ForceMode2D.Impulse);
+            }
         }
 
         //Limiting Velocity
@@ -169,6 +190,84 @@ public class PlayerMovement : MonoBehaviour
     }
     #endregion
 
+    #region Slope
+    private void SlopeCheck()
+    {
+        Vector2 checkPos = transform.position - (Vector3)(new Vector2(0.0f, myCollider.size.y / 2));
+
+        SlopeCheckHorizontal(checkPos);
+        SlopeCheckVertical(checkPos);
+    }
+
+    private void SlopeCheckHorizontal(Vector2 checkPos)
+    {
+        RaycastHit2D slopeHitFront = Physics2D.Raycast(checkPos, transform.right, slopeCheckDistance, collisionMask);
+        RaycastHit2D slopeHitBack = Physics2D.Raycast(checkPos, -transform.right, slopeCheckDistance, collisionMask);
+
+        if (slopeHitFront)
+        {
+            isOnSlope = true;
+
+            slopeSideAngle = Vector2.Angle(slopeHitFront.normal, Vector2.up);
+
+        }
+        else if (slopeHitBack)
+        {
+            isOnSlope = true;
+
+            slopeSideAngle = Vector2.Angle(slopeHitBack.normal, Vector2.up);
+        }
+        else
+        {
+            slopeSideAngle = 0.0f;
+            isOnSlope = false;
+        }
+
+    }
+
+    private void SlopeCheckVertical(Vector2 checkPos)
+    {
+        RaycastHit2D hit = Physics2D.Raycast(checkPos, Vector2.down, slopeCheckDistance, collisionMask);
+
+        if (hit)
+        {
+
+            slopeNormalPerp = Vector2.Perpendicular(hit.normal).normalized;
+
+            slopeDownAngle = Vector2.Angle(hit.normal, Vector2.up);
+
+            if (slopeDownAngle != lastSlopeAngle)
+            {
+                isOnSlope = true;
+            }
+
+            lastSlopeAngle = slopeDownAngle;
+
+            Debug.DrawRay(hit.point, slopeNormalPerp, Color.blue);
+            Debug.DrawRay(hit.point, hit.normal, Color.green);
+
+        }
+
+        if (slopeDownAngle > maxSlopeAngle || slopeSideAngle > maxSlopeAngle)
+        {
+            canWalkOnSlope = false;
+        }
+        else
+        {
+            canWalkOnSlope = true;
+        }
+
+        if (isOnSlope && canWalkOnSlope && moveDir.x == 0.0f)
+        {
+            myBody.sharedMaterial = fullFriction;
+        }
+        else
+        {
+            myBody.sharedMaterial = noFriction;
+        }
+    }
+    #endregion
+
     //return true if we are NOT moving into a wall
     bool CanMove(Vector2 moveDir)
     {
@@ -178,7 +277,7 @@ public class PlayerMovement : MonoBehaviour
     //return true if an object is under us
     void CheckGrounded()
     {
-        grounded = Physics2D.CircleCast(transform.position, myCollider.size.x, Vector3.down, groundedDistance, collisionMask).collider != null;
+        grounded = Physics2D.CircleCast(transform.position, myCollider.size.y, Vector3.down, groundedDistance, collisionMask).collider != null;
         if(wasGrounded != grounded)
         {
             GroundedChanged();

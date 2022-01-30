@@ -687,7 +687,7 @@ MonoBehaviour:
   verticalVelocityMax: {x: 2, y: 3}
   initialJumpForce: 2.5
   sustainedJumpForce: 6
-  groundedDistance: 0.125
+  groundedDistance: 0.2
   myAnim: {fileID: 4456561205447448201}
   collisionMask:
     serializedVersion: 2
