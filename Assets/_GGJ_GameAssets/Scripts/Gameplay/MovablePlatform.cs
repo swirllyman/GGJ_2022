@@ -10,10 +10,13 @@ public class MovablePlatform : GrabPlatform
 
     public GameObject platform;
 
+    internal bool inMotion = false;
+    
     float lineLocation;
     [SerializeField] float moveVelocity;
     float destination;
     float distance;
+
 
     // A platform that moves by being grappled.
     void Start()
@@ -45,14 +48,20 @@ public class MovablePlatform : GrabPlatform
         platform.transform.position = Vector3.Lerp(startingPosition.position, endPosition.position, lineLocation);
 
         // Clamp location to beginning and end.
-        if (lineLocation <= 0) {
+        if (lineLocation <= 0)
+        {
             lineLocation = 0;
             platform.transform.position = startingPosition.position;
+            inMotion = false;
         }
-        else if (lineLocation >= 1) {
+        else if (lineLocation >= 1)
+        {
             lineLocation = 1;
             platform.transform.position = endPosition.position;
+            inMotion = false;
         }
+        else
+            inMotion = true;
     }
 
     public override void OnActivate()

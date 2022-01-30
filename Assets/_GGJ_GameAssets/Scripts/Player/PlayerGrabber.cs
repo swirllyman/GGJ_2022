@@ -144,7 +144,16 @@ public class PlayerGrabber : MonoBehaviour
         {
             if (hit.collider != null && !attached & !justShot)
             {
-                ShootGrabber();
+                MovablePlatform grabPlatform = hit.collider.GetComponentInParent<MovablePlatform>();
+                if (grabPlatform != null)
+                {
+                    if (!grabPlatform.inMotion)
+                        ShootGrabber();
+                }
+                else
+                {
+                    ShootGrabber();
+                }
             }
         }
 

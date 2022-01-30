@@ -8,16 +8,13 @@ public class Bridge : MonoBehaviour
     [SerializeField] AltarHelper[] altarHelpers;
     public CinemachineVirtualCamera vCam;
     // Start is called before the first frame update
-    IEnumerator Start()
+    void Start()
     {
-        vCam.enabled = true;
+        vCam.enabled = false;
         for (int i = 0; i < altarHelpers.Length; i++)
         {
             altarHelpers[i].myAltar.onPoweredUp += MyAltar_onPoweredUp;
         }
-
-        yield return new WaitForSeconds(1.0f);
-        vCam.enabled = false;
     }
 
     private void Update()

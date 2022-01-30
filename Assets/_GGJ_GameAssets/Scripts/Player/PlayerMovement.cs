@@ -81,25 +81,37 @@ public class PlayerMovement : MonoBehaviour
     {
 
         moveDir = new Vector2(movePos.x * (grounded ? moveSpeedGround : moveSpeedAir), 0);
-        if (grounded && isOnSlope && canWalkOnSlope && !justJumped) 
+        //if (grounded && isOnSlope && canWalkOnSlope && !justJumped) 
+        //{
+
+        //    myBody.velocity = new Vector2(slopeNormalPerp.x * -moveDir.x, slopeNormalPerp.y * -moveDir.x);
+        //}
+        //else
+        //{
+        //    if (moveDir.x > 0)
+        //    {
+        //        transform.rotation = Quaternion.Euler(Vector3.zero);
+        //    }
+        //    else if (moveDir.x < 0)
+        //    {
+        //        transform.rotation = Quaternion.Euler(0, 180, 0);
+        //    }
+        //    if (CanMove(moveDir))
+        //    {
+        //        myBody.AddForce(moveDir, ForceMode2D.Impulse);
+        //    }
+        //}
+        if (moveDir.x > 0)
         {
-            
-            myBody.velocity = new Vector2(slopeNormalPerp.x * -moveDir.x, slopeNormalPerp.y * -moveDir.x);
+            transform.rotation = Quaternion.Euler(Vector3.zero);
         }
-        else
+        else if (moveDir.x < 0)
         {
-            if (moveDir.x > 0)
-            {
-                transform.rotation = Quaternion.Euler(Vector3.zero);
-            }
-            else if (moveDir.x < 0)
-            {
-                transform.rotation = Quaternion.Euler(0, 180, 0);
-            }
-            if (CanMove(moveDir))
-            {
-                myBody.AddForce(moveDir, ForceMode2D.Impulse);
-            }
+            transform.rotation = Quaternion.Euler(0, 180, 0);
+        }
+        if (CanMove(moveDir))
+        {
+            myBody.AddForce(moveDir, ForceMode2D.Impulse);
         }
 
         //Limiting Velocity

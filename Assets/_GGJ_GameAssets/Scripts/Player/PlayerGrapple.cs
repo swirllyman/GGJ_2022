@@ -26,6 +26,10 @@ public class PlayerGrapple : MonoBehaviour
     bool justShot = false;
     bool hanging = false;
 
+    const float GRAPPLE_CD = .5f;
+    float currentTimer;
+    bool onCD = false;
+
     private void Awake()
     {
         aimer = GetComponent<Aimer2D>();
@@ -40,6 +44,7 @@ public class PlayerGrapple : MonoBehaviour
     void Update()
     {
         CheckInput();
+        CheckCD();
     }
 
     private void LateUpdate()
@@ -89,6 +94,19 @@ public class PlayerGrapple : MonoBehaviour
         }
     }
 
+    void CheckCD()
+    {
+        if (onCD)
+        {
+            currentTimer -= Time.deltaTime;
+            if (currentTimer <= 0.0f)
+            {
+                onCD = false;
+                currentTimer = GRAPPLE_CD;
+            }
+        }
+    }
+
     void CheckInput()
     {
         if (Input.GetMouseButtonDown(0))
@@ -105,7 +123,7 @@ public class PlayerGrapple : MonoBehaviour
 
         if (Input.GetMouseButton(0))
         {
-            if (hit.collider != null && !attached & !justShot &! (transform.position.y > hit.point.y))
+            if (hit.collider != null && !attached & !justShot &! (transform.position.y > hit.point.y) &! onCD)
             {
                 ShootGrapple();
             }
@@ -129,6 +147,8 @@ public class PlayerGrapple : MonoBehaviour
         if (attached)
         {
             attached = false;
+            currentTimer = GRAPPLE_CD;
+            onCD = true;
             myGrappleJoint.enabled = false;
             lineRend.enabled = false;
             myAnim.SetBool("Grapple", false);
@@ -139,6 +159,8 @@ public class PlayerGrapple : MonoBehaviour
 
     void ShootGrapple()
     {
+        currentTimer = GRAPPLE_CD;
+        onCD = true;
         lineRend.enabled = true;
         myGrappleJoint.transform.position = transform.position;
         justShot = true;
@@ -170,7 +192,7 @@ public class PlayerGrapple : MonoBehaviour
     Collider2D CheckHit(Vector3 hitPos) {
         RaycastHit2D hit = Physics2D.Raycast(transform.position, hitPos);
          
-        if(hit != null && hit.collider != null){
+        if(hit.collider != null){
             return hit.collider;
         }
         else return null;

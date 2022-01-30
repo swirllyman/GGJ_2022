@@ -23,13 +23,13 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 962201491}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 8820890141109978143}
-  m_RootOrder: 7
+  m_Father: {fileID: 8832852275865693042}
+  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1436232706
 GameObject:
@@ -235,6 +235,38 @@ Transform:
   m_Father: {fileID: 8820890141109978143}
   m_RootOrder: 4
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &887914049875646657
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 8832852275865693042}
+  m_Layer: 6
+  m_Name: PlayerCameraFollow
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &8832852275865693042
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 887914049875646657}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children:
+  - {fileID: 962201492}
+  m_Father: {fileID: 8820890141109978143}
+  m_RootOrder: 7
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1248396435608765525
 GameObject:
   m_ObjectHideFlags: 0
@@ -423,7 +455,7 @@ Transform:
   m_GameObject: {fileID: 6559716941043050703}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 0.02, y: 0.02, z: 0.02}
+  m_LocalScale: {x: 0.05, y: 0.05, z: 0.05}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 8820890141109978143}
@@ -627,7 +659,7 @@ Transform:
   - {fileID: 2482342427768995700}
   - {fileID: 1833048833669805814}
   - {fileID: 2957205485421248838}
-  - {fileID: 962201492}
+  - {fileID: 8832852275865693042}
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -688,11 +720,15 @@ MonoBehaviour:
   initialJumpForce: 2.5
   sustainedJumpForce: 6
   groundedDistance: 0.2
+  slopeCheckDistance: 0
+  maxSlopeAngle: 0
+  noFriction: {fileID: 0}
+  fullFriction: {fileID: 0}
   myAnim: {fileID: 4456561205447448201}
   collisionMask:
     serializedVersion: 2
     m_Bits: 51
-  resetDistance: 20
+  resetDistance: 45
 --- !u!114 &936399164
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -707,7 +743,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   myGrappleJoint: {fileID: 1436232708}
   grappleHandsTransform: {fileID: 5446651693407367375}
-  attachDistance: 1.25
+  attachDistance: 1.35
   minDistance: 0.2
   grappleSpeed: 1.8
   grappleReleaseSpeed: 4
@@ -732,7 +768,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   grabberTip: {fileID: 1833048833669805814}
   grabberHandsTransform: {fileID: 2482342427768995700}
-  attachDistance: 1.25
+  attachDistance: 1.35
   throwForce: 5.75
   minDistance: 0.15
   shotSpeed: 5
@@ -756,6 +792,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   crosshair: {fileID: 4295845152878182330}
+  playerCameraFollow: {fileID: 8832852275865693042}
   lookAtObject: {fileID: 962201492}
   playerV_Cam: {fileID: 0}
   cameraOffsetDistance: 0.35

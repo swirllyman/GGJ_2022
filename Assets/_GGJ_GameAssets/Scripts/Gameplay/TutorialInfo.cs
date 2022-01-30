@@ -4,15 +4,40 @@ using UnityEngine;
 
 public class TutorialInfo : MonoBehaviour
 {
-    // Start is called before the first frame update
-    void Start()
+    public GameObject tutorialCanvasObject;
+    public AudioSource tutorialAudioSource;
+    public Guide guide;
+
+    Vector3 startScale;
+    private void Awake()
     {
-        
+        startScale = tutorialCanvasObject.transform.localScale;
+        tutorialCanvasObject.SetActive(false);
     }
 
-    // Update is called once per frame
-    void Update()
+    private void OnTriggerEnter2D(Collider2D collision)
     {
-        
+        if (collision.CompareTag("Player"))
+        {
+            tutorialAudioSource.Play();
+            tutorialCanvasObject.SetActive(true);
+            tutorialCanvasObject.transform.localScale = startScale;
+            LeanTween.scale(tutorialCanvasObject, startScale * 1.15f, .2f).setEasePunch();
+            guide.transform.position = transform.position;
+            guide.PlayAppear();
+        }
+    }
+
+    private void OnTriggerExit2D(Collider2D collision)
+    {
+        if (collision.CompareTag("Player"))
+        {
+            if (tutorialAudioSource.isPlaying)
+            {
+                tutorialAudioSource.Stop();
+            }
+            tutorialCanvasObject.SetActive(false);
+            guide.PlayDisappear();
+        }
     }
 }

@@ -5,6 +5,7 @@ using Cinemachine;
 public class Aimer2D : MonoBehaviour
 {
     public Transform crosshair;
+    [SerializeField] Transform playerCameraFollow;
     [SerializeField] Transform lookAtObject;
     public CinemachineVirtualCamera playerV_Cam;
     public float cameraOffsetDistance = .35f;
@@ -20,6 +21,7 @@ public class Aimer2D : MonoBehaviour
     private void Start()
     {
         composer = playerV_Cam.GetCinemachineComponent<CinemachineComposer>();
+        playerCameraFollow.transform.parent = null;
     }
 
     // Update is called once per frame
@@ -38,6 +40,7 @@ public class Aimer2D : MonoBehaviour
 
         aimDirection = Quaternion.Euler(0, 0, aimAngle * Mathf.Rad2Deg) * Vector2.right;
         SetCrosshairPosition(aimAngle);
+        playerCameraFollow.transform.position = transform.position;
         lookAtObject.localPosition = Vector3.Lerp(lookAtObject.localPosition, aimDirection * cameraOffsetDistance, Time.deltaTime * camTargetSpeed);
     }
 
