@@ -163,5 +163,16 @@ public class PlayerGrapple : MonoBehaviour
         myGrappleJoint.distance = hitDistance;
 
         aimer.crosshair.gameObject.SetActive(false);
+
+        CheckHit(hitPos);
+    }
+
+    Collider2D CheckHit(Vector3 hitPos) {
+        RaycastHit2D hit = Physics2D.Raycast(transform.position, hitPos);
+         
+        if(hit != null && hit.collider != null){
+            return hit.collider;
+        }
+        else return null;
     }
 }

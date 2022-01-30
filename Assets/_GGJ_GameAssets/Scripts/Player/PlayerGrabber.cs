@@ -226,10 +226,16 @@ public class PlayerGrabber : MonoBehaviour
         }
         else
         {
-            attachedGrabbable = hit.collider.GetComponent<Grabbable>();
-            attachedGrabbable.transform.SetParent(grabberTip);
-            attachedGrabbable.transform.localPosition = Vector3.zero;
-            attachedGrabbable.PickUp();
+            var pullableObject = hit.collider.GetComponentInParent(typeof(MovablePlatform)) as MovablePlatform;
+            if (pullableObject != null) {
+                Debug.Log("pulling");
+                pullableObject.OnActivate();
+            } else {
+                attachedGrabbable = hit.collider.GetComponent<Grabbable>();
+                attachedGrabbable.transform.SetParent(grabberTip);
+                attachedGrabbable.transform.localPosition = Vector3.zero;
+                attachedGrabbable.PickUp();
+            }
         }
     }
 
