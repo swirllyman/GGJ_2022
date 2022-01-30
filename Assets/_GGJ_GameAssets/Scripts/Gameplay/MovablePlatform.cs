@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class MovablePlatform : MonoBehaviour
+public class MovablePlatform : GrabPlatform
 {
     [SerializeField] LineRenderer lineRend;
     public Transform startingPosition;
@@ -55,7 +55,7 @@ public class MovablePlatform : MonoBehaviour
         }
     }
 
-    public void OnActivate()
+    public override void OnActivate()
     {
         if (lineLocation <= 0) {
             destination = 1;
