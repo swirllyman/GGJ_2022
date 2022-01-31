@@ -36,13 +36,13 @@ public class MovablePlatform : GrabPlatform
         // Draw line between start and end position.
         var lerpDelta = (moveVelocity / distance);
         if (lineLocation > destination) {
-            Debug.Log(lineLocation);
-            Debug.Log(destination);
+            //Debug.Log(lineLocation);
+            //Debug.Log(destination);
             lineLocation -= lerpDelta * Time.deltaTime;
         }
         else if (lineLocation < destination) {
-            Debug.Log(lineLocation);
-            Debug.Log(destination);
+            //Debug.Log(lineLocation);
+            //Debug.Log(destination);
             lineLocation += lerpDelta * Time.deltaTime;
         }
         platform.transform.position = Vector3.Lerp(startingPosition.position, endPosition.position, lineLocation);

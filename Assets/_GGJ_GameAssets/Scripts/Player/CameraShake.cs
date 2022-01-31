@@ -16,13 +16,6 @@ public class CameraShake : MonoBehaviour
 
 	Vector3 originalPos;
 
-	[ContextMenu("Shake")]
-	public void PlayShake()
-    {
-		shakeDuration = 2.5f;
-
-	}
-
 	void Awake()
 	{
 		if (camTransform == null)
