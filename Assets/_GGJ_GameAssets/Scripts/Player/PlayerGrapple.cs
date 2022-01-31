@@ -15,9 +15,17 @@ public class PlayerGrapple : MonoBehaviour
     [SerializeField] float shotDistanceCheck = .15f;
     [SerializeField] LayerMask collisionMask;
     [SerializeField] LineRenderer lineRend;
+    [SerializeField] LineRenderer preCastLineRend;
     [SerializeField] Animator myAnim;
+    [SerializeField] AudioClip shootClip;
+    [SerializeField] AudioClip attachClip;
+    [SerializeField] AudioClip pullInClip;
+    [SerializeField] AudioClip detachClip;
+    [SerializeField] AudioClip wooshClip;
+
 
     Aimer2D aimer;
+    AudioSource audioSource;
     Rigidbody2D myBody;
     CapsuleCollider2D myCollider;
     Vector2 currentHitPos;
@@ -29,12 +37,15 @@ public class PlayerGrapple : MonoBehaviour
     const float GRAPPLE_CD = .5f;
     float currentTimer;
     bool onCD = false;
+    bool canHit = false;
 
     private void Awake()
     {
         aimer = GetComponent<Aimer2D>();
         myBody = GetComponent<Rigidbody2D>();
         myCollider = GetComponent<CapsuleCollider2D>();
+        audioSource = GetComponent<AudioSource>();
+        preCastLineRend.enabled = false;
         myGrappleJoint.transform.parent = null;
         myGrappleJoint.enabled = false;
         lineRend.enabled = false;
@@ -79,7 +90,7 @@ public class PlayerGrapple : MonoBehaviour
 
     void UpdateAim()
     {
-        if(!justShot)
+        if (!justShot)
             hit = Physics2D.Raycast(transform.position, aimer.aimDirection, attachDistance, collisionMask);
         if (hit.collider != null)
         {
@@ -87,10 +98,24 @@ public class PlayerGrapple : MonoBehaviour
             {
                 aimer.aimDistance = hit.distance;
             }
+
+            canHit = !attached & !justShot & !(transform.position.y > hit.point.y) & !onCD;
         }
         else
         {
+            canHit = false;
             aimer.aimDistance = attachDistance;
+        }
+
+        if (canHit)
+        {
+            preCastLineRend.enabled = true;
+            preCastLineRend.SetPosition(0, hit.point);
+            preCastLineRend.SetPosition(1, transform.position);
+        }
+        else
+        {
+            preCastLineRend.enabled = false;
         }
     }
 
@@ -123,7 +148,7 @@ public class PlayerGrapple : MonoBehaviour
 
         if (Input.GetMouseButton(0))
         {
-            if (hit.collider != null && !attached & !justShot &! (transform.position.y > hit.point.y) &! onCD)
+            if (hit.collider != null && canHit)
             {
                 ShootGrapple();
             }
@@ -154,6 +179,8 @@ public class PlayerGrapple : MonoBehaviour
             myAnim.SetBool("Grapple", false);
             myBody.AddForce(Vector2.up * grappleReleaseSpeed, ForceMode2D.Impulse);
             aimer.crosshair.gameObject.SetActive(true);
+            audioSource.PlayOneShot(detachClip);
+            audioSource.PlayOneShot(wooshClip);
         }
     }
 
@@ -165,6 +192,7 @@ public class PlayerGrapple : MonoBehaviour
         myGrappleJoint.transform.position = transform.position;
         justShot = true;
         myAnim.SetBool("Grapple", true);
+        audioSource.PlayOneShot(shootClip);
     }
 
     void AttachGrapple(Vector3 hitPos)
@@ -185,6 +213,8 @@ public class PlayerGrapple : MonoBehaviour
         myGrappleJoint.distance = hitDistance;
 
         aimer.crosshair.gameObject.SetActive(false);
+        //audioSource.PlayOneShot(attachClip);
+        audioSource.PlayOneShot(pullInClip);
 
         CheckHit(hitPos);
     }

@@ -9,15 +9,19 @@ public class HiddenWalls : MonoBehaviour
 
     BoxCollider2D myCollider;
 
+    AudioSource mySource;
+
     private void Awake()
     {
         myCollider = GetComponent<BoxCollider2D>();
+        mySource = GetComponent<AudioSource>();
     }
 
     public void ExplodeWall()
     {
         myCollider.enabled = false;
         wallExplosionObject.SetActive(true);
+        mySource.Play();
         StartCoroutine(WallExplosionRoutine());
     }
 

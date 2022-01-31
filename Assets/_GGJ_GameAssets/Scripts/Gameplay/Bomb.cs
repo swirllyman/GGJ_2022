@@ -9,9 +9,11 @@ public class Bomb : Grabbable
     ExplosionState explosionState = ExplosionState.None;
     [SerializeField] float lifeTime = 4.0f;
     [SerializeField] GameObject explosionObject;
-    [SerializeField] GameObject roomExplosionObject;
     [SerializeField] Color explosiveColor;
     [SerializeField] float exlsionRadius = .15f;
+    [SerializeField] AudioSource audioSource;
+    [SerializeField] AudioClip fastPulseClip;
+    [SerializeField] AudioClip explodeClip;
     bool exploded = false;
     bool pickedUp = false;
 
@@ -26,6 +28,7 @@ public class Bomb : Grabbable
         LeanTween.cancel(myRend.gameObject);
         LeanTween.color(myRend.gameObject, startColor, 0.0f);
         UpdateExplosive(.5f);
+        audioSource.Play();
     }
 
     private void Update()
@@ -49,6 +52,11 @@ public class Bomb : Grabbable
 
     void UpdateExplosive(float flickerTime)
     {
+        if(flickerTime == .1f)
+        {
+            audioSource.clip = fastPulseClip;
+            audioSource.Play();
+        }
         LeanTween.cancel(myRend.gameObject);
         LeanTween.color(myRend.gameObject, startColor, 0.0f);
         LeanTween.color(myRend.gameObject, explosiveColor, flickerTime).setLoopPingPong().setEaseLinear();
@@ -65,6 +73,8 @@ public class Bomb : Grabbable
         myBody.velocity = Vector2.zero;
         myBody.angularVelocity = 0.0f;
         StartCoroutine(RemoveAfterTime());
+        audioSource.Stop();
+        audioSource.PlayOneShot(explodeClip);
     }
 
     IEnumerator RemoveAfterTime()

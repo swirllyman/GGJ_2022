@@ -15,27 +15,37 @@ public class PlayerGrabber : MonoBehaviour
     [SerializeField] LayerMask collisionMask;
     [SerializeField] LineRenderer lineRend;
     [SerializeField] LineRenderer trajectoryRend;
+    [SerializeField] LineRenderer preCastLineRend;
     [SerializeField] Animator myAnim;
+    [SerializeField] AudioClip shootClip;
+    [SerializeField] AudioClip attachClip;
+    [SerializeField] AudioClip pullInClip;
+    [SerializeField] AudioClip detachClip;
+    [SerializeField] AudioClip throwClip;
 
     internal Grabbable attachedGrabbable;
     internal bool holding = false;
+    AudioSource audioSource;
     Rigidbody2D mybody;
     Aimer2D aimer;
     Vector2 currentHitPos;
     RaycastHit2D hit;
     bool attached = false;
     bool justShot = false;
+    bool canHit = false;
 
     float grabberCD = .05f;
     bool onCD = false;
 
     private void Awake()
     {
+        audioSource = GetComponent<AudioSource>();
         mybody = GetComponent<Rigidbody2D>();
         aimer = GetComponent<Aimer2D>();
         grabberTip.parent = null;
         lineRend.enabled = false;
         trajectoryRend.enabled = false;
+        preCastLineRend.enabled = false;
     }
 
     // Update is called once per frame
@@ -113,17 +123,37 @@ public class PlayerGrabber : MonoBehaviour
     void UpdateAim()
     {
         if (!justShot)
-            hit = Physics2D.Raycast(transform.position, aimer.aimDirection, attachDistance, collisionMask);
-        if (hit.collider != null && hit.collider.CompareTag("Grabbable"))
         {
-            if (!attached)
+            hit = Physics2D.Raycast(transform.position, aimer.aimDirection, attachDistance, collisionMask);
+            if (hit.collider != null && hit.collider.CompareTag("Grabbable"))
             {
-                aimer.aimDistance = hit.distance;
+                if (!attached)
+                {
+                    aimer.aimDistance = hit.distance;
+                }
+
+                canHit = !attached & !justShot & !onCD;
+            }
+            else
+            {
+                canHit = false;
+                aimer.aimDistance = attachDistance;
             }
         }
         else
         {
-            aimer.aimDistance = attachDistance;
+            canHit = false;
+        }
+
+        if (canHit)
+        {
+            preCastLineRend.enabled = true;
+            preCastLineRend.SetPosition(0, hit.point);
+            preCastLineRend.SetPosition(1, transform.position);
+        }
+        else
+        {
+            preCastLineRend.enabled = false;
         }
     }
 
@@ -142,7 +172,7 @@ public class PlayerGrabber : MonoBehaviour
         }
         else if (Input.GetMouseButton(1) &! onCD)
         {
-            if (hit.collider != null && !attached & !justShot)
+            if (hit.collider != null && canHit)
             {
                 MovablePlatform grabPlatform = hit.collider.GetComponentInParent<MovablePlatform>();
                 if (grabPlatform != null)
@@ -200,10 +230,12 @@ public class PlayerGrabber : MonoBehaviour
                     //Debug.Log("Throwing");
                     justShot = true;
                     attachedGrabbable.Throw(aimer.aimDirection, throwForce);
+                    audioSource.PlayOneShot(throwClip);
                 }
                 else
                 {
                     attachedGrabbable.Drop();
+                    audioSource.PlayOneShot(detachClip);
                 }
             }
             holding = false;
@@ -217,6 +249,7 @@ public class PlayerGrabber : MonoBehaviour
         grabberTip.position = transform.position;
         justShot = true;
         onCD = true;
+        audioSource.PlayOneShot(shootClip);
     }
 
     void AttachGrabber()
@@ -239,11 +272,15 @@ public class PlayerGrabber : MonoBehaviour
             if (pullableObject != null) {
                 Debug.Log("pulling");
                 pullableObject.OnActivate();
-            } else {
+            } 
+            else 
+            {
                 attachedGrabbable = hit.collider.GetComponent<Grabbable>();
                 attachedGrabbable.transform.SetParent(grabberTip);
                 attachedGrabbable.transform.localPosition = Vector3.zero;
                 attachedGrabbable.PickUp();
+                audioSource.PlayOneShot(attachClip);
+                audioSource.PlayOneShot(pullInClip);
             }
         }
     }

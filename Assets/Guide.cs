@@ -7,6 +7,9 @@ public class Guide : MonoBehaviour
     public ParticleSystem disappaerParticles;
     public ParticleSystem appearParticles;
     public SpriteRenderer myRend;
+    public AudioClip appearClip;
+    public AudioClip disappearClip;
+    public AudioSource source;
 
     public float disappearTime, appearTime;
 
@@ -16,6 +19,8 @@ public class Guide : MonoBehaviour
     public void PlayDisappear()
     {
         disappaerParticles.Play();
+        if(!source.isPlaying)
+            source.PlayOneShot(disappearClip);
         if (currentRoutine != null) StopCoroutine(currentRoutine);
         currentRoutine = StartCoroutine(DisappearRoutine());
     }
@@ -30,6 +35,7 @@ public class Guide : MonoBehaviour
     public void PlayAppear()
     {
         appearParticles.Play();
+        source.PlayOneShot(appearClip);
         if (currentRoutine != null) StopCoroutine(currentRoutine);
         currentRoutine = StartCoroutine(AppearRoutine());
     }

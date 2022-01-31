@@ -5,7 +5,6 @@ using UnityEngine;
 public class TutorialInfo : MonoBehaviour
 {
     public GameObject tutorialCanvasObject;
-    public AudioSource tutorialAudioSource;
     public Guide guide;
 
     Vector3 startScale;
@@ -19,7 +18,6 @@ public class TutorialInfo : MonoBehaviour
     {
         if (collision.CompareTag("Player"))
         {
-            tutorialAudioSource.Play();
             tutorialCanvasObject.SetActive(true);
             tutorialCanvasObject.transform.localScale = startScale;
             LeanTween.scale(tutorialCanvasObject, startScale * 1.15f, .2f).setEasePunch();
@@ -32,10 +30,6 @@ public class TutorialInfo : MonoBehaviour
     {
         if (collision.CompareTag("Player"))
         {
-            if (tutorialAudioSource.isPlaying)
-            {
-                tutorialAudioSource.Stop();
-            }
             tutorialCanvasObject.SetActive(false);
             guide.PlayDisappear();
         }

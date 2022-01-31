@@ -19,9 +19,12 @@ public class Altar : MonoBehaviour
 
     [SerializeField] float moveToSpotTime = .5f;
     [SerializeField] int powerOnTime = 1;
+    [SerializeField] AudioClip noPowerClip;
+    [SerializeField] AudioClip powerOnClip;
 
     internal bool poweredUp = false;
     Vector3 startScale;
+    AudioSource audioSource;
 
     public delegate void PoweredUpCallack();
     public event PoweredUpCallack onPoweredUp;
@@ -30,6 +33,7 @@ public class Altar : MonoBehaviour
 
     private void Awake()
     {
+        audioSource = GetComponent<AudioSource>();
         startScale = messageDisplay.transform.localScale;
         messageDisplay.SetActive(false);
         LeanTween.color(gameObject, poweredDownColor, 0.0f);
@@ -57,6 +61,7 @@ public class Altar : MonoBehaviour
                 }
                 else
                 {
+                    audioSource.PlayOneShot(noPowerClip);
                     LeanTween.color(gameObject, poweredDownColor, 0.0f);
                     LeanTween.color(gameObject, altarFlashColor, flashTime).setEaseSpring().setLoopPingPong(flashLoopCount);
                 }
@@ -84,13 +89,15 @@ public class Altar : MonoBehaviour
         LeanTween.color(gameObject, poweredDownColor, 0.0f);
         LeanTween.color(gameObject, altarPowerOnColor, .1f).setEasePunch();
         colliderNeeded.enabled = false;
+        audioSource.PlayOneShot(powerOnClip);
         yield return new WaitForSeconds(.1f);
         Rigidbody2D colliderBody = colliderNeeded.GetComponent<Rigidbody2D>();
         colliderBody.bodyType = RigidbodyType2D.Kinematic;
         colliderBody.velocity = Vector2.zero;
-        colliderBody.angularVelocity = 0.0f;
+        colliderBody.angularVelocity = 30.0f;
         LeanTween.move(colliderNeeded.gameObject, powerSpot.position, moveToSpotTime).setEaseInCubic();
         yield return new WaitForSeconds(moveToSpotTime);
+        colliderBody.angularVelocity = 0.0f;
         LeanTween.color(gameObject, altarPowerOnColor, powerOnTime).setEaseOutCubic();
         LeanTween.color(powerLineRend.gameObject, altarPowerOnColor, powerOnTime).setEaseOutCubic();
         for (float i = 0; i < powerOnTime; i += Time.deltaTime)
@@ -100,6 +107,8 @@ public class Altar : MonoBehaviour
         }
 
         onPoweredUp?.Invoke();
+        yield return new WaitForSeconds(powerOnTime);
+        audioSource.Play();
     }
 
     private void OnTriggerExit2D(Collider2D collision)

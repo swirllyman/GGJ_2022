@@ -5,6 +5,7 @@ using UnityEngine.SceneManagement;
 
 [RequireComponent(typeof(Rigidbody2D))]
 [RequireComponent(typeof(CapsuleCollider2D))]
+[RequireComponent(typeof(AudioSource))]
 public class PlayerMovement : MonoBehaviour
 {
     [Header("Movement")]
@@ -13,11 +14,14 @@ public class PlayerMovement : MonoBehaviour
     [SerializeField] float maxVelocity = 1;
     [SerializeField] float wallDistanceCheck = .08f;
     [SerializeField] Vector2 verticalVelocityMax = new Vector2(3, 3);
+    [SerializeField] AudioClip runClip;
 
     [Header("Jumping")]
     [SerializeField] float initialJumpForce = 2.5f;
     [SerializeField] float sustainedJumpForce = .5f;
     [SerializeField] float groundedDistance = .1f;
+    [SerializeField] AudioClip landingClip;
+    [SerializeField] AudioClip jumpClip;
 
     [Header("Slope")]
     [SerializeField] float slopeCheckDistance;
@@ -30,10 +34,12 @@ public class PlayerMovement : MonoBehaviour
     [SerializeField] LayerMask collisionMask;
     [SerializeField] float resetDistance = 50;
 
-    Vector3 startPosition;
-    Vector2 slopeNormalPerp;
     Rigidbody2D myBody;
     CapsuleCollider2D myCollider;
+    AudioSource audioSource;
+
+    Vector3 startPosition;
+    Vector2 slopeNormalPerp;
     Vector2 movePos;
     Vector2 moveDir;
 
@@ -48,6 +54,7 @@ public class PlayerMovement : MonoBehaviour
     bool justJumped = false;
     bool grounded = false;
     bool wasGrounded = false;
+    bool wasMoving = false;
 
 
     #region Mono
@@ -55,6 +62,7 @@ public class PlayerMovement : MonoBehaviour
     {
         myBody = GetComponent<Rigidbody2D>();
         myCollider = GetComponent<CapsuleCollider2D>();
+        audioSource = GetComponent<AudioSource>();
 
         startPosition = transform.position;
     }
@@ -77,10 +85,43 @@ public class PlayerMovement : MonoBehaviour
     }
     #endregion
 
+    void MovingChanged()
+    {
+        wasMoving = !wasMoving;
+
+        if (grounded)
+        {
+            if (wasMoving)
+            {
+                audioSource.clip = runClip;
+                audioSource.Play();
+            }
+            else
+            {
+                audioSource.Stop();
+            }
+        }
+    }
+
     void UpdateMovement()
     {
 
         moveDir = new Vector2(movePos.x * (grounded ? moveSpeedGround : moveSpeedAir), 0);
+
+        if(Mathf.Abs(moveDir.x) > 0)
+        {
+            if (!wasMoving)
+            {
+                MovingChanged();
+            }
+        }
+        else
+        {
+            if (wasMoving)
+            {
+                MovingChanged();
+            }
+        }
         //if (grounded && isOnSlope && canWalkOnSlope && !justJumped) 
         //{
 
@@ -174,6 +215,7 @@ public class PlayerMovement : MonoBehaviour
         myBody.AddForce(Vector3.up * initialJumpForce, ForceMode2D.Impulse);
         if (jumpRoutine != null) StopCoroutine(jumpRoutine);
         jumpRoutine = StartCoroutine(ResetJump());
+        audioSource.PlayOneShot(jumpClip);
     }
 
 
@@ -302,6 +344,27 @@ public class PlayerMovement : MonoBehaviour
         if (grounded && justJumped)
         {
             StopJump();
+        }
+
+        if (!grounded)
+        {
+            audioSource.Stop();
+            //if (audioSource.Stop()
+            //audioSource.clip = fallingClip;
+            //audioSource.Play();
+        }
+        else
+        {
+            audioSource.PlayOneShot(landingClip);
+            if (wasMoving)
+            {
+                audioSource.clip = runClip;
+                audioSource.Play();
+            }
+            else
+            {
+                audioSource.Stop();
+            }
         }
 
     }
