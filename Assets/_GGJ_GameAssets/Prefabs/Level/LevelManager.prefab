@@ -44,3 +44,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3dfc5f8d012280845b0494f3db33df43, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  levelCompleteCanvas: {fileID: 796247562043874550, guid: 87293d48c3d8a854f872f455075ffbae, type: 3}
+  nextLevels:
+  - {fileID: 11400000, guid: 8675982196d8cf547b3981dfeda84165, type: 2}

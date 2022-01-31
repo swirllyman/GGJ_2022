@@ -6,6 +6,9 @@ using UnityEngine.SceneManagement;
 public class LevelManager : MonoBehaviour
 {
     const string PAUSE_SCENE = "pause_additive";
+
+    [SerializeField] GameObject levelCompleteCanvas;
+    [SerializeField] LevelConfig[] nextLevels;
     bool isSceneLoaded {
         get {
             for (int i = 0; i < SceneManager.sceneCount; i++) {
@@ -31,12 +34,13 @@ public class LevelManager : MonoBehaviour
         }
     }
 
+    public void RestartLevel() {
+        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
+    }
+
     public void CompleteLevel() {
-        // Mark level as completed in save
-        // Unlock next level
-        // Display option to go to next level
-        // Possible stretch goal to connect levels and indicate save at side of screen
-        Debug.Log("Level complete");
+        var nextLevelCanvas = Instantiate(levelCompleteCanvas);
+        nextLevelCanvas.GetComponent<LevelCompleteCanvas>().LoadNextLevels(nextLevels);
     }
 
     public void SetGoalComplete(string goalId) {
