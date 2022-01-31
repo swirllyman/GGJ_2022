@@ -14,6 +14,11 @@ public class SelectableLevel : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        SetupLevel();
+    }
+
+    public void SetupLevel()
+    {
         levelThumbnailImage = GetComponentInChildren<Image>();
         levelThumbnailButton = GetComponentInChildren<Button>();
         levelText = GetComponentInChildren<TMPro.TMP_Text>();

@@ -11,7 +11,8 @@ public class MovablePlatform : GrabPlatform
     public GameObject platform;
 
     internal bool inMotion = false;
-    
+
+    AudioSource myAudioSource;
     float lineLocation;
     [SerializeField] float moveVelocity;
     float destination;
@@ -21,6 +22,7 @@ public class MovablePlatform : GrabPlatform
     // A platform that moves by being grappled.
     void Start()
     {
+        myAudioSource = GetComponent<AudioSource>();
         platform.transform.position = startingPosition.position;
         lineLocation = 0;
         destination = lineLocation;
@@ -66,6 +68,7 @@ public class MovablePlatform : GrabPlatform
 
     public override void OnActivate()
     {
+        myAudioSource.Play();
         if (lineLocation <= 0) {
             destination = 1;
         }
