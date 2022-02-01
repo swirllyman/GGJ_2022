@@ -56,7 +56,6 @@ public class PlayerMovement : MonoBehaviour
     bool wasGrounded = false;
     bool wasMoving = false;
 
-
     #region Mono
     private void Awake()
     {

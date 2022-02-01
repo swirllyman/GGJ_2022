@@ -48,7 +48,6 @@ public class Bridge : MonoBehaviour
 
     IEnumerator PlayOpenRoutine()
     {
-        CameraShake shaker = vCam.GetComponent<CameraShake>();
         vCam.enabled = true;
         yield return new WaitForSeconds(.25f);
 
@@ -56,12 +55,8 @@ public class Bridge : MonoBehaviour
         for (float i = 0; i < initialShakeTime; i += Time.deltaTime)
         {
             float shakePerc = Mathf.Lerp(.01f, .1f, i / initialShakeTime);
-            shaker.shakeDuration = Time.deltaTime;
-            shaker.shakeAmount = shakePerc;
             yield return null;
         }
-        shaker.shakeDuration = 2.0f;
-        shaker.shakeAmount = .12f;
         for (int i = 0; i < altarHelpers.Length; i++)
         {
             LeanTween.rotate(altarHelpers[i].bridgeTransform.gameObject, new Vector3(0, 0, altarHelpers[i].rotationAmount), altarHelpers[i].rotationSpeed).setEaseOutBounce();

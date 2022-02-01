@@ -23,6 +23,7 @@ public class HiddenWalls : MonoBehaviour
         wallExplosionObject.SetActive(true);
         mySource.Play();
         StartCoroutine(WallExplosionRoutine());
+        FindObjectOfType<PlayerLevelStats>().UpdateSpecialCount(1);
     }
 
     IEnumerator WallExplosionRoutine()

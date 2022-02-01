@@ -76,9 +76,4 @@ public class MovablePlatform : GrabPlatform
             destination = 0;
         }
     }
-
-    [ExecuteInEditMode]
-    void RenderPlatform() {
-
-    }
 }

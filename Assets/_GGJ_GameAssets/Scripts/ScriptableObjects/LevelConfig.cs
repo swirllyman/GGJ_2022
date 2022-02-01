@@ -1,6 +1,4 @@
 using UnityEngine;
-using System;
-using System.Collections.Generic;
 
 [CreateAssetMenu(fileName = "LevelConfig", 
     menuName = "ScriptableObjects/LevelConfig", 
@@ -8,7 +6,7 @@ using System.Collections.Generic;
 public class LevelConfig : ScriptableObject
 {
     [SerializeField]
-    public LevelData levelSettings;
+    public LevelData levelData;
 
 }
 
@@ -26,4 +24,10 @@ public struct LevelData
 
     [Tooltip("Indicates if level is unlocked.")]
     public bool unlocked;
+
+    [Tooltip("Players Best completion time.")]
+    public float fastestTime;
+
+    [Tooltip("% of total completion in level.")]
+    public float percentCompleted;
 }
