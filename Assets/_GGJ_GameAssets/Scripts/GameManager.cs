@@ -7,6 +7,7 @@ public class GameManager : MonoBehaviour
 {
     public static GameManager singleton;
     public static bool isLoading = false;
+    public static bool isStory = true;
     public AudioSource mySource;
     public AudioClip[] uiSounds;
     LoadingScreen loadingScreen;
@@ -51,6 +52,7 @@ public class GameManager : MonoBehaviour
         }
         else
         {
+            Debug.Log(sceneName +" Does Not Exist. Loading TitleScreen");
             SceneManager.LoadScene("TitleScreen");
         }
     }

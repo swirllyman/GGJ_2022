@@ -30,6 +30,8 @@ public class PlayerGrapple : MonoBehaviour
     CapsuleCollider2D myCollider;
     Vector2 currentHitPos;
     RaycastHit2D hit;
+    PlayerMovement movement;
+    MovablePlatform movablePlatform;
     bool attached = false;
     bool justShot = false;
     bool hanging = false;
@@ -41,6 +43,7 @@ public class PlayerGrapple : MonoBehaviour
 
     private void Awake()
     {
+        movement = GetComponent<PlayerMovement>();
         aimer = GetComponent<Aimer2D>();
         myBody = GetComponent<Rigidbody2D>();
         myCollider = GetComponent<CapsuleCollider2D>();
@@ -63,21 +66,44 @@ public class PlayerGrapple : MonoBehaviour
         UpdateAim();
         if (justShot)
         {
-            Vector3 moveDir = (hit.point - (Vector2)myGrappleJoint.transform.position).normalized * Time.deltaTime * shotSpeed;
+            Vector2 destination = hit.point;
+            Vector3 moveDir;
+            if (movablePlatform != null)
+            {
+                destination = new Vector2(destination.x, movablePlatform.platform.transform.position.y);
+                moveDir = (destination - (Vector2)myGrappleJoint.transform.position).normalized * Time.deltaTime * shotSpeed;
+                if (Vector3.Distance(myGrappleJoint.transform.position, destination) < shotDistanceCheck)
+                {
+                    AttachGrappleToPlatform();
+                }
+            }
+            else
+            {
+                moveDir = (hit.point - (Vector2)myGrappleJoint.transform.position).normalized * Time.deltaTime * shotSpeed;
+                if (Vector3.Distance(myGrappleJoint.transform.position, hit.point) < shotDistanceCheck)
+                {
+                    AttachGrapple(hit.point);
+                }
+            }
+
             myGrappleJoint.transform.position += moveDir;
             lineRend.SetPosition(0, grappleHandsTransform.position);
             lineRend.SetPosition(1, myGrappleJoint.transform.position);
-            if (Vector3.Distance(myGrappleJoint.transform.position, hit.point) < shotDistanceCheck)
-            {
-                AttachGrapple(hit.point);
-            }
         }
 
         if (attached)
         {
-            myGrappleJoint.distance -= (Time.deltaTime * grappleSpeed);
+            if (movablePlatform != null && movablePlatform.inMotion)
+            {
+                //Need to determine speed
+                myGrappleJoint.distance -= /*(Time.deltaTime * grappleSpeed / 10)*/0.0f;
+            }
+            else
+            {
+                myGrappleJoint.distance -= (Time.deltaTime * grappleSpeed);
+            }
             lineRend.SetPosition(0, grappleHandsTransform.position);
-            lineRend.SetPosition(1, currentHitPos);
+            lineRend.SetPosition(1, myGrappleJoint.transform.position);
 
             if (myGrappleJoint.distance <= minDistance)
             {
@@ -91,7 +117,22 @@ public class PlayerGrapple : MonoBehaviour
     void UpdateAim()
     {
         if (!justShot)
+        {
             hit = Physics2D.Raycast(transform.position, aimer.aimDirection, attachDistance, collisionMask);
+            if (!attached)
+            {
+                Collider2D colliderHit = hit.collider;
+                if (colliderHit != null)
+                {
+                    if (colliderHit.CompareTag("MovablePlatform"))
+                        movablePlatform = colliderHit.GetComponentInParent<MovablePlatform>();
+                    else
+                        movablePlatform = null;
+                }
+                else
+                    movablePlatform = null;
+            }
+        }
         if (hit.collider != null)
         {
             if (!attached)
@@ -148,7 +189,7 @@ public class PlayerGrapple : MonoBehaviour
 
         if (Input.GetMouseButton(0))
         {
-            if (hit.collider != null && canHit)
+            if (hit.collider != null && canHit &! movement.pauseMovement)
             {
                 ShootGrapple();
             }
@@ -181,6 +222,7 @@ public class PlayerGrapple : MonoBehaviour
             aimer.crosshair.gameObject.SetActive(true);
             audioSource.PlayOneShot(detachClip);
             audioSource.PlayOneShot(wooshClip);
+            movablePlatform = null;
         }
     }
 
@@ -189,17 +231,23 @@ public class PlayerGrapple : MonoBehaviour
         currentTimer = GRAPPLE_CD;
         onCD = true;
         lineRend.enabled = true;
+        myGrappleJoint.transform.parent = null;
         myGrappleJoint.transform.position = transform.position;
         justShot = true;
         myAnim.SetBool("Grapple", true);
         audioSource.PlayOneShot(shootClip);
     }
 
+    void AttachGrappleToPlatform()
+    {
+        myGrappleJoint.transform.parent = movablePlatform.platform.transform;
+        AttachGrapple(myGrappleJoint.transform.position);
+    }
+
     void AttachGrapple(Vector3 hitPos)
     {
         attached = true;
         justShot = false;
-
         myGrappleJoint.enabled = true;
         aimer.crosshair.gameObject.SetActive(false);
 
@@ -221,10 +269,6 @@ public class PlayerGrapple : MonoBehaviour
 
     Collider2D CheckHit(Vector3 hitPos) {
         RaycastHit2D hit = Physics2D.Raycast(transform.position, hitPos);
-         
-        if(hit.collider != null){
-            return hit.collider;
-        }
-        else return null;
+        return hit.collider;
     }
 }

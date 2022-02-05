@@ -11,7 +11,6 @@ public class Bomb : Grabbable
     [SerializeField] GameObject explosionObject;
     [SerializeField] Color explosiveColor;
     [SerializeField] float exlsionRadius = .15f;
-    [SerializeField] AudioSource audioSource;
     [SerializeField] AudioClip fastPulseClip;
     [SerializeField] AudioClip explodeClip;
     bool exploded = false;

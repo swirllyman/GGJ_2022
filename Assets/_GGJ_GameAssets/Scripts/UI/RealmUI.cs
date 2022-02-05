@@ -15,8 +15,8 @@ public class RealmUI : MonoBehaviour
 
         for (int i = 0; i < levelButtons.Length; i++)
         {
-            LevelData currentData = realmData.levels[i].levelData;
-            levelButtons[i].levelNameText.text = currentData.levelName;
+            LevelData currentData = realmData.levels[i];
+            levelButtons[i].levelNameText.text = currentData.displayName;
 
             levelButtons[i].button.interactable = currentData.unlocked;
             levelButtons[i].precentCompleteText.text = (currentData.percentCompleted * 100).ToString("F0") + "%";

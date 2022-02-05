@@ -5,13 +5,18 @@ using UnityEngine;
 public class Grabbable : MonoBehaviour
 {
     [SerializeField] protected SpriteRenderer myRend;
+    [SerializeField] protected AudioSource audioSource;
     [SerializeField] Color flashColor;
     [SerializeField] float flashTime = 1.0f;
     [SerializeField] LeanTweenType tweenType;
+    [SerializeField] AudioClip hitGroundClip;
+    [SerializeField] float minSoundHitSpeed = .01f;
+    [SerializeField] float minSoundCD = .1f;
 
+    float soundTimer = 0.0f;
     internal Collider2D myCollider;
     protected Color startColor;
-    protected Rigidbody2D myBody;
+    internal Rigidbody2D myBody;
 
     private void Awake()
     {
@@ -21,6 +26,15 @@ public class Grabbable : MonoBehaviour
         startColor = myRend.color;
         LeanTween.color(myRend.gameObject, flashColor, flashTime).setLoopPingPong().setEase(tweenType);
     }
+
+    private void Update()
+    {
+        if(soundTimer > 0)
+        {
+            soundTimer -= Time.deltaTime;
+        }
+    }
+
 
     public virtual void PickUp()
     {
@@ -41,5 +55,14 @@ public class Grabbable : MonoBehaviour
         Drop();
         myBody.AddForce(direction * force, ForceMode2D.Impulse);
         myBody.angularVelocity = -55 * force;
+    }
+
+    private void OnCollisionEnter2D(Collision2D collision)
+    {
+        if(myBody.velocity.magnitude > minSoundHitSpeed && soundTimer <= 0.0f)
+        {
+            audioSource.PlayOneShot(hitGroundClip);
+            soundTimer = minSoundCD;
+        }
     }
 }

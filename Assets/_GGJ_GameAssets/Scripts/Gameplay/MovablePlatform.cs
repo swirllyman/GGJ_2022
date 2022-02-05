@@ -10,6 +10,7 @@ public class MovablePlatform : GrabPlatform
 
     public GameObject platform;
 
+    [SerializeField] bool retractOnComplete = false;
     internal bool inMotion = false;
 
     AudioSource myAudioSource;
@@ -61,6 +62,10 @@ public class MovablePlatform : GrabPlatform
             lineLocation = 1;
             platform.transform.position = endPosition.position;
             inMotion = false;
+            if (retractOnComplete)
+            {
+                OnActivate();
+            }
         }
         else
             inMotion = true;

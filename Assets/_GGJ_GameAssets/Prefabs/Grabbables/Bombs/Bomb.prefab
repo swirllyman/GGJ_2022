@@ -155,14 +155,17 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   myRend: {fileID: 3251435009817153148}
+  audioSource: {fileID: 1357674414429450633}
   flashColor: {r: 0.4895363, g: 1, b: 0.11764705, a: 1}
   flashTime: 1
   tweenType: 19
+  hitGroundClip: {fileID: 8300000, guid: ab6251bbc0376834bb4569a86d34f2de, type: 3}
+  minSoundHitSpeed: 0.01
+  minSoundCD: 0.1
   lifeTime: 4
   explosionObject: {fileID: 835034472}
   explosiveColor: {r: 1, g: 0.1882353, b: 0, a: 1}
   exlsionRadius: 0.4
-  audioSource: {fileID: 1357674414429450633}
   fastPulseClip: {fileID: 8300000, guid: 9f0a6b95a41abbb44ba522f6dcd98370, type: 3}
   explodeClip: {fileID: 8300000, guid: e68e56a3556c02c4fa89956095bc1d61, type: 3}
 --- !u!212 &3251435009817153148
@@ -225,7 +228,7 @@ Rigidbody2D:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 3251435009817153144}
-  m_BodyType: 2
+  m_BodyType: 0
   m_Simulated: 1
   m_UseFullKinematicContacts: 0
   m_UseAutoMass: 0
@@ -236,7 +239,7 @@ Rigidbody2D:
   m_Material: {fileID: 0}
   m_Interpolate: 0
   m_SleepingMode: 1
-  m_CollisionDetection: 0
+  m_CollisionDetection: 1
   m_Constraints: 0
 --- !u!58 &3251435009817153150
 CircleCollider2D:
@@ -266,7 +269,7 @@ AudioSource:
   OutputAudioMixerGroup: {fileID: 8398540730325447819, guid: c8e73b9c13c1a144cb66990f0a6e5a26, type: 2}
   m_audioClip: {fileID: 8300000, guid: 4aa27ca15f5416c4590dd0967500232b, type: 3}
   m_PlayOnAwake: 0
-  m_Volume: 1
+  m_Volume: 0.5
   m_Pitch: 1
   Loop: 1
   Mute: 0

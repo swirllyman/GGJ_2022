@@ -125,7 +125,7 @@ public class PlayerGrabber : MonoBehaviour
         if (!justShot)
         {
             hit = Physics2D.Raycast(transform.position, aimer.aimDirection, attachDistance, collisionMask);
-            if (hit.collider != null && hit.collider.CompareTag("Grabbable"))
+            if (hit.collider != null && (hit.collider.CompareTag("Grabbable") || hit.collider.CompareTag("MovablePlatform")))
             {
                 if (!attached)
                 {
@@ -275,11 +275,14 @@ public class PlayerGrabber : MonoBehaviour
             else 
             {
                 attachedGrabbable = hit.collider.GetComponent<Grabbable>();
-                attachedGrabbable.transform.SetParent(grabberTip);
-                attachedGrabbable.transform.localPosition = Vector3.zero;
-                attachedGrabbable.PickUp();
-                audioSource.PlayOneShot(attachClip);
-                audioSource.PlayOneShot(pullInClip);
+                if (attachedGrabbable != null)
+                {
+                    attachedGrabbable.transform.SetParent(grabberTip);
+                    attachedGrabbable.transform.localPosition = Vector3.zero;
+                    attachedGrabbable.PickUp();
+                    audioSource.PlayOneShot(attachClip);
+                    audioSource.PlayOneShot(pullInClip);
+                }
             }
         }
     }

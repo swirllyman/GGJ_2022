@@ -7,19 +7,12 @@ using UnityEngine;
     order = 4)]
 public class RealmConfig : ScriptableObject
 {
-    [SerializeField]
-    public RealmData realmData;
-}
-[System.Serializable]
-public struct RealmData
-{
     [Tooltip("Name of the level.")]
     public string realmName;
-
-    [Tooltip("Indicates if realm is unlocked.")]
-    public bool unlocked;
-
     public LevelConfig[] levels;
 
-    internal float percentCompleted;
+    public void SetLevelData(int levelID, LevelData data)
+    {
+        levels[levelID].levelData = data;
+    }
 }

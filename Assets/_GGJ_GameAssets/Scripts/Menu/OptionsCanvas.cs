@@ -40,6 +40,12 @@ public class OptionsCanvas : MonoBehaviour
         pauseCanvasObject.SetActive(false);
     }
 
+    public void RestartLevel()
+    {
+        GameManager.singleton.PlaySceneLoad(SceneManager.GetActiveScene().name);
+        Unpause();
+    }
+
     public void MainMenu()
     {
         GameManager.singleton.PlaySceneLoad("TitleScreen");

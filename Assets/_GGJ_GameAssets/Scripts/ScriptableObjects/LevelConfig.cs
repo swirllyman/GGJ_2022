@@ -8,26 +8,39 @@ public class LevelConfig : ScriptableObject
     [SerializeField]
     public LevelData levelData;
 
+    internal int world, level;
+
 }
 
 [System.Serializable]
-public struct LevelData
+public class LevelData
 {
     [Tooltip("Name of the level.")]
-    public string levelName;
-    
+    public string displayName;
+
     [Tooltip("The scene that's loaded when the level is played.")]
     public string internalSceneName;
 
-    [Tooltip("Thumbnail for level select.")]
-    public Sprite levelThumbnail;
 
-    [Tooltip("Indicates if level is unlocked.")]
-    public bool unlocked;
+    [HideInInspector] public bool unlocked;
+    [HideInInspector] public float fastestTime;
+    [HideInInspector] public float percentCompleted;
 
-    [Tooltip("Players Best completion time.")]
-    public float fastestTime;
+    public LevelData(string newName, string newSceneName, bool isUnlocked, float newTime, float newPerc)
+    {
+        displayName = newName;
+        internalSceneName = newSceneName;
+        unlocked = isUnlocked;
+        fastestTime = newTime;
+        percentCompleted = newPerc;
+    }
 
-    [Tooltip("% of total completion in level.")]
-    public float percentCompleted;
+    public LevelData(LevelData copyData)
+    {
+        displayName = copyData.displayName;
+        internalSceneName = copyData.internalSceneName;
+        unlocked = copyData.unlocked;
+        fastestTime = copyData.fastestTime;
+        percentCompleted = copyData.percentCompleted;
+    }
 }

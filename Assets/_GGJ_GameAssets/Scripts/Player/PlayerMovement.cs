@@ -20,6 +20,7 @@ public class PlayerMovement : MonoBehaviour
     [SerializeField] float initialJumpForce = 2.5f;
     [SerializeField] float sustainedJumpForce = .5f;
     [SerializeField] float groundedDistance = .1f;
+    [SerializeField] float groundRadiusCheck = .08f;
     [SerializeField] AudioClip landingClip;
     [SerializeField] AudioClip jumpClip;
 
@@ -42,19 +43,33 @@ public class PlayerMovement : MonoBehaviour
     Vector2 slopeNormalPerp;
     Vector2 movePos;
     Vector2 moveDir;
+    Vector2 slopeHitAngle;
 
     Coroutine jumpRoutine;
 
     private bool isOnSlope;
     private bool canWalkOnSlope;
     private float slopeDownAngle;
-    private float slopeSideAngle;
+    private float slopeAngle;
     private float lastSlopeAngle;
 
     bool justJumped = false;
     bool grounded = false;
     bool wasGrounded = false;
     bool wasMoving = false;
+    bool facingRight = true;
+
+    internal bool pauseMovement = false;
+
+    internal void PauseMovement(bool pause)
+    {
+        pauseMovement = pause;
+        if (pause)
+        {
+            movePos = Vector2.zero;
+
+        }
+    }
 
     #region Mono
     private void Awake()
@@ -70,9 +85,19 @@ public class PlayerMovement : MonoBehaviour
     void Update()
     {
         CheckGrounded();
-        movePos = new Vector2(Input.GetAxisRaw("Horizontal"), Input.GetAxisRaw("Vertical"));
+
+        if (!pauseMovement)
+        {
+            CheckMovementInput();
+            CheckJump();
+        }
         CheckReset();
-        CheckJump();
+        UpdateAnimation();
+    }
+
+    void CheckMovementInput()
+    {
+        movePos = new Vector2(Input.GetAxisRaw("Horizontal"), Input.GetAxisRaw("Vertical"));
     }
 
     private void FixedUpdate()
@@ -80,7 +105,6 @@ public class PlayerMovement : MonoBehaviour
         SlopeCheck();
         UpdateMovement();
         UpdateJump();
-        UpdateAnimation();
     }
     #endregion
 
@@ -121,38 +145,46 @@ public class PlayerMovement : MonoBehaviour
                 MovingChanged();
             }
         }
-        //if (grounded && isOnSlope && canWalkOnSlope && !justJumped) 
-        //{
 
-        //    myBody.velocity = new Vector2(slopeNormalPerp.x * -moveDir.x, slopeNormalPerp.y * -moveDir.x);
-        //}
-        //else
-        //{
-        //    if (moveDir.x > 0)
-        //    {
-        //        transform.rotation = Quaternion.Euler(Vector3.zero);
-        //    }
-        //    else if (moveDir.x < 0)
-        //    {
-        //        transform.rotation = Quaternion.Euler(0, 180, 0);
-        //    }
-        //    if (CanMove(moveDir))
-        //    {
-        //        myBody.AddForce(moveDir, ForceMode2D.Impulse);
-        //    }
-        //}
         if (moveDir.x > 0)
         {
             transform.rotation = Quaternion.Euler(Vector3.zero);
+            facingRight = true;
         }
         else if (moveDir.x < 0)
         {
             transform.rotation = Quaternion.Euler(0, 180, 0);
+            facingRight = false;
         }
+
         if (CanMove(moveDir))
         {
-            myBody.AddForce(moveDir, ForceMode2D.Impulse);
+            if (isOnSlope)
+            {
+                //Vector2 moveSlope = new Vector2(Mathf.Abs(slopeHitAngle.x), Mathf.Abs(slopeHitAngle.y));
+                if (canWalkOnSlope)
+                {
+                    
+                    myBody.AddForce(slopeHitAngle * (facingRight ? moveDir.x : -moveDir.x), ForceMode2D.Impulse);
+                }
+            }
+            else
+            {
+                myBody.AddForce(moveDir, ForceMode2D.Impulse);
+            }
         }
+        //if (moveDir.x > 0)
+        //{
+        //    transform.rotation = Quaternion.Euler(Vector3.zero);
+        //}
+        //else if (moveDir.x < 0)
+        //{
+        //    transform.rotation = Quaternion.Euler(0, 180, 0);
+        //}
+        //if (CanMove(moveDir))
+        //{
+        //    myBody.AddForce(moveDir, ForceMode2D.Impulse);
+        //}
 
         //Limiting Velocity
         if (Mathf.Abs(myBody.velocity.x) > maxVelocity)
@@ -173,11 +205,17 @@ public class PlayerMovement : MonoBehaviour
     
     void UpdateAnimation()
     {
-        if (!justJumped)
+        myAnim.SetFloat("GroundSpeed", Mathf.Abs(moveDir.x) > 0 ? 1.0f : 0.0f);
+        myAnim.SetBool("Falling", !grounded);
+        if (isOnSlope)
         {
-            myAnim.SetFloat("GroundSpeed", Mathf.Abs(moveDir.x) > 0 ? 1.0f : 0.0f);
-            myAnim.SetBool("Falling", !grounded);
+            myAnim.SetBool("Falling", !canWalkOnSlope);
         }
+        //if (!justJumped)
+        //{
+        //    myAnim.SetFloat("GroundSpeed", Mathf.Abs(moveDir.x) > 0 ? 1.0f : 0.0f);
+        //    myAnim.SetBool("Falling", !grounded);
+        //}
     }
 
     void CheckReset()
@@ -209,11 +247,13 @@ public class PlayerMovement : MonoBehaviour
     void Jump()
     {
         justJumped = true;
+        isOnSlope = false;
         //Debug.Log("Jumping");
         myAnim.SetBool("Jumping", true);
         myBody.AddForce(Vector3.up * initialJumpForce, ForceMode2D.Impulse);
         if (jumpRoutine != null) StopCoroutine(jumpRoutine);
         jumpRoutine = StartCoroutine(ResetJump());
+        audioSource.Stop();
         audioSource.PlayOneShot(jumpClip);
     }
 
@@ -249,89 +289,125 @@ public class PlayerMovement : MonoBehaviour
         Vector2 checkPos = transform.position - (Vector3)(new Vector2(0.0f, myCollider.size.y / 2));
 
         SlopeCheckHorizontal(checkPos);
-        SlopeCheckVertical(checkPos);
+        //SlopeCheckVertical(checkPos);
     }
 
     private void SlopeCheckHorizontal(Vector2 checkPos)
     {
-        RaycastHit2D slopeHitFront = Physics2D.Raycast(checkPos, transform.right, slopeCheckDistance, collisionMask);
-        RaycastHit2D slopeHitBack = Physics2D.Raycast(checkPos, -transform.right, slopeCheckDistance, collisionMask);
-
-        if (slopeHitFront)
+        Vector2 dir = moveDir.x > 0 ? Vector3.right : Vector3.left;
+        RaycastHit2D hitSlope = Physics2D.Raycast(checkPos, dir, slopeCheckDistance, collisionMask);
+        Debug.DrawRay(checkPos, dir * slopeCheckDistance, hitSlope.collider == null ? Color.red : Color.blue);
+        if (hitSlope.collider != null)
         {
             isOnSlope = true;
+            slopeAngle = Vector2.Angle(hitSlope.normal, Vector3.up);
+            if (!facingRight)
+            {
+                slopeAngle += 90;
+            }
+            slopeHitAngle = GetDirectionVector2D(slopeAngle);
 
-            slopeSideAngle = Vector2.Angle(slopeHitFront.normal, Vector2.up);
+            if (Mathf.Max(Mathf.Abs(slopeHitAngle.x), Mathf.Abs(slopeHitAngle.y)) > maxSlopeAngle)
+            {
+                canWalkOnSlope = false;
+                Debug.DrawRay(checkPos, slopeHitAngle * slopeCheckDistance, Color.red);
+            }
+            else
+            {
+                canWalkOnSlope = true;
+                Debug.DrawRay(checkPos, slopeHitAngle * slopeCheckDistance, Color.yellow);
+            }
 
-        }
-        else if (slopeHitBack)
-        {
-            isOnSlope = true;
-
-            slopeSideAngle = Vector2.Angle(slopeHitBack.normal, Vector2.up);
         }
         else
         {
-            slopeSideAngle = 0.0f;
+            slopeAngle = 0.0f;
             isOnSlope = false;
         }
 
-    }
-
-    private void SlopeCheckVertical(Vector2 checkPos)
-    {
-        RaycastHit2D hit = Physics2D.Raycast(checkPos, Vector2.down, slopeCheckDistance, collisionMask);
-
-        if (hit)
-        {
-
-            slopeNormalPerp = Vector2.Perpendicular(hit.normal).normalized;
-
-            slopeDownAngle = Vector2.Angle(hit.normal, Vector2.up);
-
-            if (slopeDownAngle != lastSlopeAngle)
-            {
-                isOnSlope = true;
-            }
-
-            lastSlopeAngle = slopeDownAngle;
-
-            Debug.DrawRay(hit.point, slopeNormalPerp, Color.blue);
-            Debug.DrawRay(hit.point, hit.normal, Color.green);
-
-        }
-
-        if (slopeDownAngle > maxSlopeAngle || slopeSideAngle > maxSlopeAngle)
-        {
-            canWalkOnSlope = false;
-        }
-        else
-        {
-            canWalkOnSlope = true;
-        }
-
-        if (isOnSlope && canWalkOnSlope && moveDir.x == 0.0f)
+        if(moveDir.x == 0.0f)
         {
             myBody.sharedMaterial = fullFriction;
+            
+            if(isOnSlope &!canWalkOnSlope)
+            {
+                myBody.sharedMaterial = noFriction;
+            }
         }
         else
         {
             myBody.sharedMaterial = noFriction;
         }
     }
+
+    Vector3 GetDirectionVector2D(float angle)
+    {
+        return new Vector2(Mathf.Cos(angle * Mathf.Deg2Rad), Mathf.Sin(angle * Mathf.Deg2Rad)).normalized;
+    }
+
+    //private void SlopeCheckVertical(Vector2 checkPos)
+    //{
+    //    RaycastHit2D hit = Physics2D.Raycast(checkPos, Vector2.down, groundedDistance, collisionMask);
+
+    //    if (hit)        //Standing on slope
+    //    {
+
+    //        slopeNormalPerp = Vector2.Perpendicular(hit.normal).normalized;
+
+    //        slopeDownAngle = Vector2.Angle(hit.normal, Vector2.up);
+
+    //        if (slopeDownAngle != lastSlopeAngle)
+    //        {
+    //            isOnSlope = true;
+    //        }
+
+    //        lastSlopeAngle = slopeDownAngle;
+
+    //        Debug.DrawRay(hit.point, slopeNormalPerp, Color.blue);
+    //        Debug.DrawRay(hit.point, hit.normal, Color.green);
+
+    //    }
+
+    //    if (slopeDownAngle > maxSlopeAngle || slopeSideAngle > maxSlopeAngle)
+    //    {
+    //        canWalkOnSlope = false;
+    //    }
+    //    else
+    //    {
+    //        canWalkOnSlope = true;
+    //    }
+
+    //    if (isOnSlope && canWalkOnSlope && moveDir.x == 0.0f)
+    //    {
+    //        myBody.sharedMaterial = fullFriction;
+    //    }
+    //    else
+    //    {
+    //        myBody.sharedMaterial = noFriction;
+    //    }
+    //}
     #endregion
 
     //return true if we are NOT moving into a wall
     bool CanMove(Vector2 moveDir)
     {
-        return Physics2D.Raycast(transform.position, moveDir.x > 0 ? Vector3.right : Vector3.left, wallDistanceCheck, collisionMask).collider == null;
+        SlopeCheck();
+
+        bool canMove = Physics2D.Raycast(transform.position, moveDir.x > 0 ? Vector3.right : Vector3.left, wallDistanceCheck, collisionMask).collider == null;
+        Debug.DrawRay(transform.position, (moveDir.x > 0 ? Vector3.right : Vector3.left) * wallDistanceCheck, canMove ? Color.green : Color.red);
+        return canMove;
     }
 
     //return true if an object is under us
     void CheckGrounded()
     {
-        grounded = Physics2D.CircleCast(transform.position, myCollider.size.y, Vector3.down, groundedDistance, collisionMask).collider != null;
-        if(wasGrounded != grounded)
+        grounded = Physics2D.CircleCast(transform.position, groundRadiusCheck, Vector3.down, groundedDistance, collisionMask).collider != null;
+        Debug.DrawRay(transform.position, Vector3.down * groundedDistance, grounded ? Color.green : Color.red);
+
+        if (isOnSlope & !canWalkOnSlope)
+            grounded = false;
+
+        if (wasGrounded != grounded)
         {
             GroundedChanged();
         }
@@ -340,31 +416,30 @@ public class PlayerMovement : MonoBehaviour
     void GroundedChanged()
     {
         wasGrounded = grounded;
-        if (grounded && justJumped)
+        if (grounded)
         {
             StopJump();
         }
 
-        if (!grounded)
+        if(!justJumped)
         {
-            audioSource.Stop();
-            //if (audioSource.Stop()
-            //audioSource.clip = fallingClip;
-            //audioSource.Play();
-        }
-        else
-        {
-            audioSource.PlayOneShot(landingClip);
-            if (wasMoving)
-            {
-                audioSource.clip = runClip;
-                audioSource.Play();
-            }
-            else
+            if (!grounded)
             {
                 audioSource.Stop();
             }
+            else
+            {
+                if (wasMoving)
+                {
+                    audioSource.clip = runClip;
+                    audioSource.Play();
+                }
+                else
+                {
+                    audioSource.Stop();
+                }
+                audioSource.PlayOneShot(landingClip);
+            }
         }
-
     }
 }

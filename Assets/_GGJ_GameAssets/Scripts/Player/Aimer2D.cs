@@ -7,7 +7,6 @@ public class Aimer2D : MonoBehaviour
     public Transform crosshair;
     [SerializeField] Transform playerCameraFollow;
     [SerializeField] Transform lookAtObject;
-    public CinemachineVirtualCamera playerV_Cam;
     public float cameraOffsetDistance = .35f;
     [SerializeField] float camTargetSpeed = .25f;
     internal Vector3 aimDirection;
@@ -16,11 +15,8 @@ public class Aimer2D : MonoBehaviour
     
     float mouseDistance;
 
-    CinemachineComposer composer;
-
     private void Start()
     {
-        composer = playerV_Cam.GetCinemachineComponent<CinemachineComposer>();
         playerCameraFollow.transform.parent = null;
     }
 

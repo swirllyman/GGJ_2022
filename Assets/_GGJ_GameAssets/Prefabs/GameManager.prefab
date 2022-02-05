@@ -515,6 +515,7 @@ GameObject:
   - component: {fileID: 9089721670428243209}
   - component: {fileID: 9089721670428243208}
   - component: {fileID: 1498751329474760048}
+  - component: {fileID: 3582984058598803652}
   m_Layer: 0
   m_Name: GameManager
   m_TagString: Untagged
@@ -573,6 +574,21 @@ MonoBehaviour:
   - {fileID: 3279921732116183145}
   loadingScreenTexts:
   - {fileID: 4424284399831221555}
+--- !u!114 &3582984058598803652
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 9089721670428243211}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 80058a28b7498f54e88edcf43b0f5fb2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  realmConfigs:
+  - {fileID: 11400000, guid: e736f95bdfbba484a97037603302be34, type: 2}
+  - {fileID: 11400000, guid: e397a98048d32fa47b3c6a1cd8af5a9b, type: 2}
 --- !u!1001 &6386612300883488005
 PrefabInstance:
   m_ObjectHideFlags: 0

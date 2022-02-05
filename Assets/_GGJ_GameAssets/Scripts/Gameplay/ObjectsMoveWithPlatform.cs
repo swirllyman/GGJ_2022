@@ -5,13 +5,13 @@ using UnityEngine;
 public class ObjectsMoveWithPlatform : MonoBehaviour
 {
     void OnCollisionEnter2D(Collision2D collision) {
-        if (collision.gameObject.tag == "Player" || collision.gameObject.tag == "Joint") {
+        if (collision.gameObject.tag == "Player" /*|| collision.gameObject.tag == "Grabbable"*/) {
             collision.collider.transform.SetParent(transform);
         }
     }
 
     void OnCollisionExit2D(Collision2D collision) {
-        if (collision.gameObject.tag == "Player" || collision.gameObject.tag == "Joint") {
+        if (collision.gameObject.tag == "Player" || collision.gameObject.tag == "Joint" /*|| collision.gameObject.tag == "Grabbable"*/) {
             collision.collider.transform.SetParent(null);
         }
     }

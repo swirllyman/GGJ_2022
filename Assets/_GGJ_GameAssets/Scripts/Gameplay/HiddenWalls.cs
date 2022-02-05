@@ -6,6 +6,7 @@ public class HiddenWalls : MonoBehaviour
 {
     public GameObject wallExplosionObject;
     public GameObject hiddenVisuals;
+    public GameObject destroyedVisuals;
 
     BoxCollider2D myCollider;
 
@@ -15,6 +16,8 @@ public class HiddenWalls : MonoBehaviour
     {
         myCollider = GetComponent<BoxCollider2D>();
         mySource = GetComponent<AudioSource>();
+        hiddenVisuals.SetActive(true);
+        destroyedVisuals.SetActive(false);
     }
 
     public void ExplodeWall()
@@ -30,6 +33,7 @@ public class HiddenWalls : MonoBehaviour
     {
         yield return new WaitForSeconds(.15f);
         hiddenVisuals.SetActive(false);
+        destroyedVisuals.SetActive(true);
         yield return new WaitForSeconds(1.0f);
         wallExplosionObject.SetActive(false);
 

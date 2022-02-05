@@ -21,6 +21,7 @@ public class BombPlant : MonoBehaviour
         if(currentBomb == null)
         {
             currentBomb = Instantiate(bombPrefab, spawnPosition).GetComponent<Bomb>();
+            currentBomb.myBody.isKinematic = true;
             LeanTween.scale(currentBomb.gameObject, currentBomb.transform.localScale * 1.15f, .15f).setEasePunch();
             currentBomb.onPickup += OnBombPickup;
         }

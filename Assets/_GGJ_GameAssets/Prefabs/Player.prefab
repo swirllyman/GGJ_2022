@@ -506,6 +506,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 8832852275865693042}
+  - component: {fileID: 839873728900062495}
   m_Layer: 6
   m_Name: PlayerCameraFollow
   m_TagString: Untagged
@@ -529,6 +530,14 @@ Transform:
   m_Father: {fileID: 8820890141109978143}
   m_RootOrder: 7
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!81 &839873728900062495
+AudioListener:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 887914049875646657}
+  m_Enabled: 1
 --- !u!1 &1248396435608765525
 GameObject:
   m_ObjectHideFlags: 0
@@ -959,7 +968,7 @@ CapsuleCollider2D:
   m_GameObject: {fileID: 8820890141109978130}
   m_Enabled: 1
   m_Density: 1
-  m_Material: {fileID: 6200000, guid: d21fa6e7beb8f984abf1111fc3a350f5, type: 2}
+  m_Material: {fileID: 0}
   m_IsTrigger: 0
   m_UsedByEffector: 0
   m_UsedByComposite: 0
@@ -986,18 +995,19 @@ MonoBehaviour:
   runClip: {fileID: 8300000, guid: d9425e5047da65c4e84717f203f7265b, type: 3}
   initialJumpForce: 2.5
   sustainedJumpForce: 6
-  groundedDistance: 0.2
+  groundedDistance: 0.12
+  groundRadiusCheck: 0.05
   landingClip: {fileID: 8300000, guid: b3e09e79188a22e4bb0c43202aad7d59, type: 3}
   jumpClip: {fileID: 8300000, guid: e3e42cff28a383a4da2c4bcfeb8e24b5, type: 3}
   slopeCheckDistance: 0.125
-  maxSlopeAngle: 65
-  noFriction: {fileID: 6200000, guid: d21fa6e7beb8f984abf1111fc3a350f5, type: 2}
-  fullFriction: {fileID: 6200000, guid: 2852c85c0a9e27b47901222e57bd2b30, type: 2}
+  maxSlopeAngle: 0.85
+  noFriction: {fileID: 6200000, guid: 2852c85c0a9e27b47901222e57bd2b30, type: 2}
+  fullFriction: {fileID: 6200000, guid: d21fa6e7beb8f984abf1111fc3a350f5, type: 2}
   myAnim: {fileID: 4456561205447448201}
   collisionMask:
     serializedVersion: 2
     m_Bits: 51
-  resetDistance: 45
+  resetDistance: 60
 --- !u!114 &936399164
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1012,7 +1022,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   myGrappleJoint: {fileID: 1436232708}
   grappleHandsTransform: {fileID: 5446651693407367375}
-  attachDistance: 1.4
+  attachDistance: 1.425
   minDistance: 0.2
   grappleSpeed: 1.8
   grappleReleaseSpeed: 4
@@ -1043,7 +1053,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   grabberTip: {fileID: 1833048833669805814}
   grabberHandsTransform: {fileID: 2482342427768995700}
-  attachDistance: 1.4
+  attachDistance: 1.425
   throwForce: 5.75
   minDistance: 0.15
   shotSpeed: 5
@@ -1075,7 +1085,6 @@ MonoBehaviour:
   crosshair: {fileID: 4295845152878182330}
   playerCameraFollow: {fileID: 8832852275865693042}
   lookAtObject: {fileID: 962201492}
-  playerV_Cam: {fileID: 0}
   cameraOffsetDistance: 0.35
   camTargetSpeed: 1
 --- !u!82 &3084708829465507996
