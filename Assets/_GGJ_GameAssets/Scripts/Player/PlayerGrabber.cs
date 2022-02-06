@@ -125,7 +125,7 @@ public class PlayerGrabber : MonoBehaviour
         if (!justShot)
         {
             hit = Physics2D.Raycast(transform.position, aimer.aimDirection, attachDistance, collisionMask);
-            if (hit.collider != null && (hit.collider.CompareTag("Grabbable") || hit.collider.CompareTag("MovablePlatform")))
+            if (hit.collider != null && hit.collider.CompareTag("Grabbable"))
             {
                 if (!attached)
                 {
@@ -174,16 +174,7 @@ public class PlayerGrabber : MonoBehaviour
         {
             if (hit.collider != null && canHit)
             {
-                MovablePlatform grabPlatform = hit.collider.GetComponentInParent<MovablePlatform>();
-                if (grabPlatform != null)
-                {
-                    if (!grabPlatform.inMotion)
-                        ShootGrabber();
-                }
-                else
-                {
-                    ShootGrabber();
-                }
+                ShootGrabber();
             }
         }
 

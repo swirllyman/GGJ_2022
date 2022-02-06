@@ -7,6 +7,8 @@ public class PlayerGrapple : MonoBehaviour
 {
     [SerializeField] DistanceJoint2D myGrappleJoint;
     [SerializeField] Transform grappleHandsTransform;
+    [SerializeField] Transform grappleHookTransform;
+    [SerializeField] float hookOffsetDistance;
     [SerializeField] float attachDistance = .7f;
     [SerializeField] float minDistance = .2f;
     [SerializeField] float grappleSpeed = 2.5f;
@@ -52,6 +54,7 @@ public class PlayerGrapple : MonoBehaviour
         myGrappleJoint.transform.parent = null;
         myGrappleJoint.enabled = false;
         lineRend.enabled = false;
+        grappleHookTransform.gameObject.SetActive(false);
     }
 
     // Update is called once per frame
@@ -61,13 +64,21 @@ public class PlayerGrapple : MonoBehaviour
         CheckCD();
     }
 
+    void UpdateHookPosition()
+    {
+        Vector3 lookPos = (grappleHandsTransform.position - myGrappleJoint.transform.position).normalized;
+
+        grappleHookTransform.position = myGrappleJoint.transform.position + lookPos * hookOffsetDistance;
+        grappleHookTransform.up = -lookPos;
+    }
+
     private void LateUpdate()
     {
         UpdateAim();
         if (justShot)
         {
             Vector2 destination = hit.point;
-            Vector3 moveDir;
+            Vector3 moveDir = Vector3.zero;
             if (movablePlatform != null)
             {
                 destination = new Vector2(destination.x, movablePlatform.platform.transform.position.y);
@@ -77,7 +88,7 @@ public class PlayerGrapple : MonoBehaviour
                     AttachGrappleToPlatform();
                 }
             }
-            else
+            else if(hit.collider != null)
             {
                 moveDir = (hit.point - (Vector2)myGrappleJoint.transform.position).normalized * Time.deltaTime * shotSpeed;
                 if (Vector3.Distance(myGrappleJoint.transform.position, hit.point) < shotDistanceCheck)
@@ -89,26 +100,31 @@ public class PlayerGrapple : MonoBehaviour
             myGrappleJoint.transform.position += moveDir;
             lineRend.SetPosition(0, grappleHandsTransform.position);
             lineRend.SetPosition(1, myGrappleJoint.transform.position);
+            UpdateHookPosition();
         }
 
         if (attached)
         {
-            if (movablePlatform != null && movablePlatform.inMotion)
+            if (!hanging)
             {
-                //Need to determine speed
-                myGrappleJoint.distance -= /*(Time.deltaTime * grappleSpeed / 10)*/0.0f;
-            }
-            else
-            {
-                myGrappleJoint.distance -= (Time.deltaTime * grappleSpeed);
+                if (movablePlatform != null && movablePlatform.inMotion)
+                {
+                    //Need to determine speed
+                    myGrappleJoint.distance -= (Time.deltaTime * grappleSpeed / 10);
+                }
+                else
+                {
+                    myGrappleJoint.distance -= (Time.deltaTime * grappleSpeed);
+                }
             }
             lineRend.SetPosition(0, grappleHandsTransform.position);
             lineRend.SetPosition(1, myGrappleJoint.transform.position);
+            UpdateHookPosition();
 
             if (myGrappleJoint.distance <= minDistance)
             {
-                //hanging = true;
-                RemoveGrapple();
+                hanging = true;
+                //RemoveGrapple();
                 //Or Detach
             }
         }
@@ -205,6 +221,7 @@ public class PlayerGrapple : MonoBehaviour
     {
         justShot = false;
         lineRend.enabled = false;
+        grappleHookTransform.gameObject.SetActive(false);
         myAnim.SetBool("Grapple", false);
     }
 
@@ -212,11 +229,13 @@ public class PlayerGrapple : MonoBehaviour
     {
         if (attached)
         {
+            hanging = false;
             attached = false;
             currentTimer = GRAPPLE_CD;
             onCD = true;
             myGrappleJoint.enabled = false;
             lineRend.enabled = false;
+            grappleHookTransform.gameObject.SetActive(false);
             myAnim.SetBool("Grapple", false);
             myBody.AddForce(Vector2.up * grappleReleaseSpeed, ForceMode2D.Impulse);
             aimer.crosshair.gameObject.SetActive(true);
@@ -231,6 +250,7 @@ public class PlayerGrapple : MonoBehaviour
         currentTimer = GRAPPLE_CD;
         onCD = true;
         lineRend.enabled = true;
+        grappleHookTransform.gameObject.SetActive(true);
         myGrappleJoint.transform.parent = null;
         myGrappleJoint.transform.position = transform.position;
         justShot = true;
@@ -253,18 +273,25 @@ public class PlayerGrapple : MonoBehaviour
 
         currentHitPos = hitPos;
 
-        lineRend.SetPosition(0, grappleHandsTransform.position);
-        lineRend.SetPosition(1, hitPos);
         myGrappleJoint.enabled = true;
         myGrappleJoint.transform.position = hitPos;
+
+        lineRend.SetPosition(0, grappleHandsTransform.position);
+        lineRend.SetPosition(1, hitPos);
+        UpdateHookPosition();
         float hitDistance = Vector3.Distance(transform.position, hitPos);
         myGrappleJoint.distance = hitDistance;
 
         aimer.crosshair.gameObject.SetActive(false);
         //audioSource.PlayOneShot(attachClip);
         audioSource.PlayOneShot(pullInClip);
-
         CheckHit(hitPos);
+
+        if (movablePlatform != null)
+        {
+            if(!movablePlatform.inMotion)
+                movablePlatform.OnActivate();
+        }
     }
 
     Collider2D CheckHit(Vector3 hitPos) {
