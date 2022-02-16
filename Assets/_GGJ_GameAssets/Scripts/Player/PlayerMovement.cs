@@ -288,17 +288,12 @@ public class PlayerMovement : MonoBehaviour
     {
         Vector2 checkPos = transform.position - (Vector3)(new Vector2(0.0f, myCollider.size.y / 2));
 
-        SlopeCheckHorizontal(checkPos);
-        //SlopeCheckVertical(checkPos);
-    }
-
-    private void SlopeCheckHorizontal(Vector2 checkPos)
-    {
         Vector2 dir = moveDir.x > 0 ? Vector3.right : Vector3.left;
         RaycastHit2D hitSlope = Physics2D.Raycast(checkPos, dir, slopeCheckDistance, collisionMask);
         Debug.DrawRay(checkPos, dir * slopeCheckDistance, hitSlope.collider == null ? Color.red : Color.blue);
-        if (hitSlope.collider != null)
+        if (hitSlope.collider != null && Mathf.Abs(hitSlope.normal.x) < .9f)
         {
+            //print("Hit Normal: " + hitSlope.normal);
             isOnSlope = true;
             slopeAngle = Vector2.Angle(hitSlope.normal, Vector3.up);
             if (!facingRight)
@@ -325,11 +320,11 @@ public class PlayerMovement : MonoBehaviour
             isOnSlope = false;
         }
 
-        if(moveDir.x == 0.0f)
+        if (moveDir.x == 0.0f)
         {
             myBody.sharedMaterial = fullFriction;
-            
-            if(isOnSlope &!canWalkOnSlope)
+
+            if (isOnSlope & !canWalkOnSlope)
             {
                 myBody.sharedMaterial = noFriction;
             }
@@ -344,48 +339,6 @@ public class PlayerMovement : MonoBehaviour
     {
         return new Vector2(Mathf.Cos(angle * Mathf.Deg2Rad), Mathf.Sin(angle * Mathf.Deg2Rad)).normalized;
     }
-
-    //private void SlopeCheckVertical(Vector2 checkPos)
-    //{
-    //    RaycastHit2D hit = Physics2D.Raycast(checkPos, Vector2.down, groundedDistance, collisionMask);
-
-    //    if (hit)        //Standing on slope
-    //    {
-
-    //        slopeNormalPerp = Vector2.Perpendicular(hit.normal).normalized;
-
-    //        slopeDownAngle = Vector2.Angle(hit.normal, Vector2.up);
-
-    //        if (slopeDownAngle != lastSlopeAngle)
-    //        {
-    //            isOnSlope = true;
-    //        }
-
-    //        lastSlopeAngle = slopeDownAngle;
-
-    //        Debug.DrawRay(hit.point, slopeNormalPerp, Color.blue);
-    //        Debug.DrawRay(hit.point, hit.normal, Color.green);
-
-    //    }
-
-    //    if (slopeDownAngle > maxSlopeAngle || slopeSideAngle > maxSlopeAngle)
-    //    {
-    //        canWalkOnSlope = false;
-    //    }
-    //    else
-    //    {
-    //        canWalkOnSlope = true;
-    //    }
-
-    //    if (isOnSlope && canWalkOnSlope && moveDir.x == 0.0f)
-    //    {
-    //        myBody.sharedMaterial = fullFriction;
-    //    }
-    //    else
-    //    {
-    //        myBody.sharedMaterial = noFriction;
-    //    }
-    //}
     #endregion
 
     //return true if we are NOT moving into a wall

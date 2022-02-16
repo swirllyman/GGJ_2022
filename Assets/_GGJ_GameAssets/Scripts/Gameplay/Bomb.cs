@@ -19,6 +19,9 @@ public class Bomb : Grabbable
     public delegate void PickUpCallback();
     public event PickUpCallback onPickup;
 
+    public delegate void BombExplodeCallback(Bomb b);
+    public event BombExplodeCallback onExplode;
+
     public override void PickUp()
     {
         base.PickUp();
@@ -74,6 +77,7 @@ public class Bomb : Grabbable
         StartCoroutine(RemoveAfterTime());
         audioSource.Stop();
         audioSource.PlayOneShot(explodeClip);
+        onExplode?.Invoke(this);
     }
 
     IEnumerator RemoveAfterTime()

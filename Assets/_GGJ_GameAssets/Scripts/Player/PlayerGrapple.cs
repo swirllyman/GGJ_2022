@@ -15,6 +15,7 @@ public class PlayerGrapple : MonoBehaviour
     [SerializeField] float grappleReleaseSpeed = 2.5f;
     [SerializeField] float shotSpeed = .7f;
     [SerializeField] float shotDistanceCheck = .15f;
+    [SerializeField] float lineEndOffset = .15f;
     [SerializeField] LayerMask collisionMask;
     [SerializeField] LineRenderer lineRend;
     [SerializeField] LineRenderer preCastLineRend;
@@ -38,7 +39,7 @@ public class PlayerGrapple : MonoBehaviour
     bool justShot = false;
     bool hanging = false;
 
-    const float GRAPPLE_CD = .5f;
+    const float GRAPPLE_CD = .15f;
     float currentTimer;
     bool onCD = false;
     bool canHit = false;
@@ -67,9 +68,10 @@ public class PlayerGrapple : MonoBehaviour
     void UpdateHookPosition()
     {
         Vector3 lookPos = (grappleHandsTransform.position - myGrappleJoint.transform.position).normalized;
+        grappleHookTransform.up = -lookPos;
 
         grappleHookTransform.position = myGrappleJoint.transform.position + lookPos * hookOffsetDistance;
-        grappleHookTransform.up = -lookPos;
+        lineRend.SetPosition(1, myGrappleJoint.transform.position + lookPos * lineEndOffset);
     }
 
     private void LateUpdate()
@@ -86,6 +88,7 @@ public class PlayerGrapple : MonoBehaviour
                 if (Vector3.Distance(myGrappleJoint.transform.position, destination) < shotDistanceCheck)
                 {
                     AttachGrappleToPlatform();
+                    moveDir = Vector2.zero;
                 }
             }
             else if(hit.collider != null)
@@ -94,6 +97,7 @@ public class PlayerGrapple : MonoBehaviour
                 if (Vector3.Distance(myGrappleJoint.transform.position, hit.point) < shotDistanceCheck)
                 {
                     AttachGrapple(hit.point);
+                    moveDir = Vector2.zero;
                 }
             }
 

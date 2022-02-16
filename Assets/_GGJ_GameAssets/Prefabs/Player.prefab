@@ -1108,13 +1108,14 @@ MonoBehaviour:
   myGrappleJoint: {fileID: 1436232708}
   grappleHandsTransform: {fileID: 5446651693407367375}
   grappleHookTransform: {fileID: 909474619675206620}
-  hookOffsetDistance: 0.075
+  hookOffsetDistance: 0.01
   attachDistance: 1.5
-  minDistance: 0.2
+  minDistance: 0.4
   grappleSpeed: 1.8
   grappleReleaseSpeed: 4
   shotSpeed: 8
   shotDistanceCheck: 0.1
+  lineEndOffset: 0.06
   collisionMask:
     serializedVersion: 2
     m_Bits: 51
