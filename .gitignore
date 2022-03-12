@@ -22,3 +22,9 @@
 /[Tt]emp/
 /[Uu]serSettings/
 /[Bb]uilds/
+Assets/Ludiq/
+Assets/Ludiq.Generated/
+Assets/ConsolePro/
+Assets/Ludiq.Generated.meta
+Assets/Ludiq.meta
+Assets/ConsolePro.meta
