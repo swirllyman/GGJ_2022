@@ -296,9 +296,6 @@ public class PlayerGrabber : MonoBehaviour
         //Destroy the tile at the position on all tilemaps
         tpos = m_TileMap.WorldToCell(worldPoint);
         m_TileMap.SetTile(tpos, null);
-
-        //Replenish the tiles remaining
-        //tilesRemaining++;
     }
 
     public Vector3[] Plot(Rigidbody2D body, Vector2 pos, Vector2 vel, int steps)
