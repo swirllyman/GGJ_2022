@@ -93,7 +93,7 @@ public class Altar : MonoBehaviour
         yield return new WaitForSeconds(.1f);
         Rigidbody2D colliderBody = colliderNeeded.GetComponent<Rigidbody2D>();
         colliderBody.bodyType = RigidbodyType2D.Kinematic;
-        colliderBody.velocity = Vector2.zero;
+        colliderBody.linearVelocity = Vector2.zero;
         colliderBody.angularVelocity = 30.0f;
         LeanTween.move(colliderNeeded.gameObject, powerSpot.position, moveToSpotTime).setEaseInCubic();
         yield return new WaitForSeconds(moveToSpotTime);

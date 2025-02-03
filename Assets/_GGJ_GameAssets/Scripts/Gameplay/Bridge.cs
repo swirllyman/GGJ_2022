@@ -1,12 +1,12 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using Cinemachine;
+using Unity.Cinemachine;
 
 public class Bridge : MonoBehaviour
 {
     [SerializeField] AltarHelper[] altarHelpers;
-    public CinemachineVirtualCamera vCam;
+    public CinemachineCamera vCam;
     // Start is called before the first frame update
     void Start()
     {

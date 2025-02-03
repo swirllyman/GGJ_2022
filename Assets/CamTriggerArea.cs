@@ -1,12 +1,12 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using Cinemachine;
+using Unity.Cinemachine;
 
 [RequireComponent(typeof(Collider2D))]
 public class CamTriggerArea : MonoBehaviour
 {
-    public CinemachineVirtualCamera vCam;
+    public CinemachineCamera vCam;
 
     Coroutine observeRoutine;
 

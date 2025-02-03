@@ -283,7 +283,7 @@ public class PlayerGrabber : MonoBehaviour
         List<Vector3> results = new List<Vector3>();
         float timestep = Time.fixedDeltaTime / Physics2D.velocityIterations;
         Vector2 gravityAccel = Physics2D.gravity * body.gravityScale * timestep * timestep;
-        float drag = 1f - timestep * body.drag;
+        float drag = 1f - timestep * body.linearDamping;
         Vector2 moveStep = vel * timestep;
 
         for (int i = 0; i < steps; i++)

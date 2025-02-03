@@ -9,7 +9,7 @@ public class ResetZone : MonoBehaviour
     {
         if (collision.CompareTag("Player"))
         {
-            collision.GetComponent<Rigidbody2D>().velocity = Vector2.zero;
+            collision.GetComponent<Rigidbody2D>().linearVelocity = Vector2.zero;
             collision.transform.position = resetTransform.position;
         }
     }

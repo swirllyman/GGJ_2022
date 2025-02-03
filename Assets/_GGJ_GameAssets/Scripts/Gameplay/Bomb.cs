@@ -72,7 +72,7 @@ public class Bomb : Grabbable
         explosionObject.SetActive(true);
         myCollider.enabled = false;
         myBody.bodyType = RigidbodyType2D.Kinematic;
-        myBody.velocity = Vector2.zero;
+        myBody.linearVelocity = Vector2.zero;
         myBody.angularVelocity = 0.0f;
         StartCoroutine(RemoveAfterTime());
         audioSource.Stop();

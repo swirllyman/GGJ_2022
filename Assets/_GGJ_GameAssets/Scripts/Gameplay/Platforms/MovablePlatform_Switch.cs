@@ -1,12 +1,12 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using Cinemachine;
+using Unity.Cinemachine;
 public class MovablePlatform_Switch : MovablePlatform
 {
     [SerializeField] SubTrigger subTrigger;
     [SerializeField] BasicSwitch mySwitch;
-    [SerializeField] CinemachineVirtualCamera vCam;
+    [SerializeField] CinemachineCamera vCam;
     // Start is called before the first frame update
     protected override void Start()
     {

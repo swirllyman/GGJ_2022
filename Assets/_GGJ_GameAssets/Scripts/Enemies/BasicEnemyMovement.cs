@@ -80,7 +80,7 @@ public class BasicEnemyMovement : MonoBehaviour
 
         startPosition = transform.position;
 
-        myBody.velocity = new Vector3(0.01f, 0, 0);
+        myBody.linearVelocity = new Vector3(0.01f, 0, 0);
     }
 
     // Update is called once per frame
@@ -197,19 +197,19 @@ public class BasicEnemyMovement : MonoBehaviour
         //}
 
         //Limiting Velocity
-        if (Mathf.Abs(myBody.velocity.x) > maxVelocity)
+        if (Mathf.Abs(myBody.linearVelocity.x) > maxVelocity)
         {
-            myBody.velocity = new Vector3(myBody.velocity.x > 0 ? maxVelocity : -maxVelocity, myBody.velocity.y);
+            myBody.linearVelocity = new Vector3(myBody.linearVelocity.x > 0 ? maxVelocity : -maxVelocity, myBody.linearVelocity.y);
         }
 
-        if (myBody.velocity.y < 0 && Mathf.Abs(myBody.velocity.y) > verticalVelocityMax.x)
+        if (myBody.linearVelocity.y < 0 && Mathf.Abs(myBody.linearVelocity.y) > verticalVelocityMax.x)
         {
-            myBody.velocity = new Vector3(myBody.velocity.x, -verticalVelocityMax.x);
+            myBody.linearVelocity = new Vector3(myBody.linearVelocity.x, -verticalVelocityMax.x);
         }
 
-        if (myBody.velocity.y > 0 && Mathf.Abs(myBody.velocity.y) > verticalVelocityMax.y)
+        if (myBody.linearVelocity.y > 0 && Mathf.Abs(myBody.linearVelocity.y) > verticalVelocityMax.y)
         {
-            myBody.velocity = new Vector3(myBody.velocity.x, verticalVelocityMax.y);
+            myBody.linearVelocity = new Vector3(myBody.linearVelocity.x, verticalVelocityMax.y);
         }
     }
     
@@ -238,7 +238,7 @@ public class BasicEnemyMovement : MonoBehaviour
 
     private void Reset()
     {
-        myBody.velocity = Vector3.zero;
+        myBody.linearVelocity = Vector3.zero;
         transform.position = startPosition;
     }
 
