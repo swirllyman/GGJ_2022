@@ -1,6 +1,8 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Tilemaps;
+
 
 [RequireComponent(typeof(Aimer2D))]
 public class PlayerGrabber : MonoBehaviour
@@ -22,6 +24,7 @@ public class PlayerGrabber : MonoBehaviour
     [SerializeField] AudioClip pullInClip;
     [SerializeField] AudioClip detachClip;
     [SerializeField] AudioClip throwClip;
+    [SerializeField] Tilemap m_TileMap, m_StaticTileMap;
 
     internal Grabbable attachedGrabbable;
     internal bool holding = false;
@@ -36,6 +39,8 @@ public class PlayerGrabber : MonoBehaviour
 
     float grabberCD = .05f;
     bool onCD = false;
+
+    Vector2 worldPoint;
 
     private void Awake()
     {
@@ -276,6 +281,24 @@ public class PlayerGrabber : MonoBehaviour
                 }
             }
         }
+    }
+
+    public void DestroyTile()
+    {
+        //Check if the tile contains a static tile, if so, return
+        var tpos = m_StaticTileMap.WorldToCell(worldPoint);
+        if (m_StaticTileMap.GetTile(tpos) != null)
+        {
+            Debug.Log("Static Tile at position, cannot destroy");
+            return;
+        }
+
+        //Destroy the tile at the position on all tilemaps
+        tpos = m_TileMap.WorldToCell(worldPoint);
+        m_TileMap.SetTile(tpos, null);
+
+        //Replenish the tiles remaining
+        //tilesRemaining++;
     }
 
     public Vector3[] Plot(Rigidbody2D body, Vector2 pos, Vector2 vel, int steps)
